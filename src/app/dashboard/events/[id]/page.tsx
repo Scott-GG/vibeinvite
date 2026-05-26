@@ -14,6 +14,7 @@ import { createClient } from "@/lib/supabase/server";
 import { RealtimeStats } from "@/components/dashboard/RealtimeStats";
 import { DietaryChart } from "@/components/dashboard/DietaryChart";
 import { AiCopywriter } from "@/components/dashboard/AiCopywriter";
+import { UpgradeButton } from "@/app/dashboard/billing/upgrade-button";
 
 export default async function EventDetailPage({
   params,
@@ -92,13 +93,11 @@ export default async function EventDetailPage({
             Send Invites
           </Link>
           {isFree ? (
-            <Link
-              href={`/dashboard/billing`}
-              className={buttonVariants({ variant: "secondary" })}
-            >
-              <Table className="mr-2 h-4 w-4" />
-              Upgrade for Seating
-            </Link>
+            <UpgradeButton
+              type="pro_event"
+              eventId={id}
+              label="Unlock Pro — $29"
+            />
           ) : (
             <Link
               href={`/dashboard/events/${id}/seating`}
@@ -178,12 +177,17 @@ export default async function EventDetailPage({
             Generate beautiful invitation copy with AI. Upgrade to Pro or
             Unlimited to unlock.
           </p>
-          <Link
-            href="/dashboard/billing"
-            className="mt-4 inline-block text-sm font-medium text-stone-900 underline"
-          >
-            Upgrade Now
-          </Link>
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <UpgradeButton
+              type="pro_event"
+              eventId={id}
+              label="Unlock Pro — $29"
+            />
+            <UpgradeButton
+              type="subscription"
+              label="Go Unlimited — $9.99/mo"
+            />
+          </div>
         </div>
       ) : (
         <div className="mt-8">
