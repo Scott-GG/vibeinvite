@@ -58,12 +58,23 @@ export default async function InvitationPage({
 
   if (!event) notFound();
 
-  const themeConfig =
+  const config =
     typeof event.config === "object" && event.config !== null
       ? (event.config as Record<string, unknown>)
       : {};
 
-  const theme = (themeConfig?.theme as string) ?? "classic";
+  const theme = (config?.theme as string) ?? "classic";
+  const message = (config?.invitation_message as string) ?? undefined;
+  const registryUrl = (config?.registry_url as string) ?? undefined;
+  const dressCode = (config?.dress_code as string) ?? undefined;
+
+  const eventDate = new Date(event.event_date);
+  const eventTime = eventDate.getHours() !== 0 || eventDate.getMinutes() !== 0
+    ? eventDate.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : undefined;
 
   return (
     <InvitationClient
@@ -71,17 +82,21 @@ export default async function InvitationPage({
       guestName={`${guest.first_name} ${guest.last_name}`}
       eventTitle={event.title}
       eventType={event.event_type}
-      eventDate={new Date(event.event_date).toLocaleDateString("en-US", {
+      eventDate={eventDate.toLocaleDateString("en-US", {
         weekday: "long",
         year: "numeric",
         month: "long",
         day: "numeric",
       })}
-      eventDateRaw={new Date(event.event_date)}
+      eventDateRaw={eventDate}
+      eventTime={eventTime}
       eventLocation={event.location_name ?? undefined}
       plusOneAllowed={guest.plus_one_allowed}
       theme={theme}
       coverImage={event.cover_image_url ?? undefined}
+      message={message}
+      registryUrl={registryUrl}
+      dressCode={dressCode}
     />
   );
 }

@@ -20,10 +20,14 @@ interface InvitationClientProps {
   eventType: string;
   eventDate: string;
   eventDateRaw: Date;
+  eventTime?: string;
   eventLocation?: string;
   plusOneAllowed: boolean;
   theme: string;
   coverImage?: string;
+  message?: string;
+  registryUrl?: string;
+  dressCode?: string;
 }
 
 export function InvitationClient({
@@ -33,10 +37,14 @@ export function InvitationClient({
   eventType,
   eventDate,
   eventDateRaw,
+  eventTime,
   eventLocation,
   plusOneAllowed,
-  theme: _theme,
+  theme,
   coverImage,
+  message,
+  registryUrl,
+  dressCode,
 }: InvitationClientProps) {
   async function handleRsvp(data: RsvpFormData) {
     await submitRsvp({
@@ -53,6 +61,7 @@ export function InvitationClient({
       eventType={eventType}
       coverImage={coverImage}
       eventDate={eventDateRaw}
+      theme={theme}
     >
       <RsvpForm
         guestName={guestName}
@@ -60,7 +69,13 @@ export function InvitationClient({
         dietaryOptions={dietaryOptions}
         eventTitle={eventTitle}
         eventDate={eventDate}
+        eventTime={eventTime}
         eventLocation={eventLocation}
+        message={message}
+        coverImage={coverImage}
+        registryUrl={registryUrl}
+        dressCode={dressCode}
+        theme={theme}
         onSubmit={handleRsvp}
       />
     </EnvelopeUX>

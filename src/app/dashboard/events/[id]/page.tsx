@@ -192,6 +192,7 @@ export default async function EventDetailPage({
       ) : (
         <div className="mt-8">
           <AiCopywriter
+            eventId={id}
             eventTitle={event.title}
             eventType={event.event_type}
             eventDate={new Date(event.event_date).toLocaleDateString("en-US", {

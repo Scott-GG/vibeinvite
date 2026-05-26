@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CountdownTimer } from "./CountdownTimer";
+import { getTheme, type ThemeConfig } from "@/lib/themes";
 
 type EnvelopeState = "sealed" | "opening" | "open";
 
@@ -12,6 +13,7 @@ interface EnvelopeUXProps {
   hostName?: string;
   coverImage?: string;
   eventDate?: Date;
+  theme?: string;
   children: React.ReactNode;
 }
 
@@ -21,16 +23,18 @@ export function EnvelopeUX({
   hostName,
   coverImage,
   eventDate,
+  theme: themeId = "classic",
   children,
 }: EnvelopeUXProps) {
   const [state, setState] = useState<EnvelopeState>("sealed");
   const [mounted, setMounted] = useState(false);
+  const t: ThemeConfig = getTheme(themeId);
+  const isDark = themeId === "midnight";
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Generate particles only on client to avoid hydration mismatch
   const floatingParticles = useMemo(
     () =>
       Array.from({ length: 12 }, (_, i) => ({
@@ -52,8 +56,13 @@ export function EnvelopeUX({
 
   if (state === "open") {
     return (
-      <div className="relative flex min-h-screen items-start justify-center bg-stone-100 px-4 py-8 sm:py-16">
-        {/* Floating particles background — only on client to avoid SSR window access */}
+      <div
+        className={`relative flex min-h-screen items-start justify-center px-4 py-8 sm:py-16 ${t.openBg}`}
+        style={{
+          background: `linear-gradient(135deg, var(--tw-gradient-stops))`,
+        }}
+      >
+        {/* Floating particles */}
         {mounted && (
           <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
             {floatingParticles.map((p) => (
@@ -65,7 +74,7 @@ export function EnvelopeUX({
                   bottom: -10,
                   width: p.size,
                   height: p.size,
-                  backgroundColor: "#c9a96e",
+                  backgroundColor: t.particleColor,
                 }}
                 initial={{ y: 0, opacity: 0 }}
                 animate={{
@@ -83,15 +92,33 @@ export function EnvelopeUX({
           </div>
         )}
 
+        {/* Hero: cover image or themed gradient banner */}
+        {coverImage ? (
+          <div className="absolute top-0 left-0 right-0 h-64 overflow-hidden">
+            <img
+              src={coverImage}
+              alt=""
+              className="h-full w-full object-cover opacity-40"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-transparent" />
+          </div>
+        ) : (
+          <div
+            className={`absolute top-0 left-0 right-0 h-48 bg-gradient-to-b ${t.heroGradient}`}
+          />
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full max-w-lg"
+          className="relative z-10 w-full max-w-lg"
         >
           {eventDate && (
             <div className="mb-8">
-              <p className="mb-3 text-center text-xs tracking-[0.2em] text-stone-400 uppercase">
+              <p
+                className={`mb-3 text-center text-xs tracking-[0.2em] uppercase ${t.cardSubtitle}`}
+              >
                 The celebration begins in
               </p>
               <CountdownTimer eventDate={eventDate} />
@@ -104,12 +131,14 @@ export function EnvelopeUX({
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-stone-100 px-4">
+    <div
+      className={`flex min-h-screen items-center justify-center px-4 ${t.openBg}`}
+    >
       <div className="relative w-full max-w-md">
         {/* Envelope Body */}
         <motion.div
           className="relative overflow-hidden rounded-xl shadow-2xl"
-          style={{ aspectRatio: "4/3", background: "#f7f3ed" }}
+          style={{ aspectRatio: "4/3", backgroundColor: t.envelopeBg }}
           animate={
             state === "opening"
               ? { scale: 1.02 }
@@ -117,7 +146,13 @@ export function EnvelopeUX({
           }
         >
           {/* Envelope texture */}
-          <div className="absolute inset-0 bg-[radial-gradient(#d4c5b2_1px,transparent_1px)] bg-[length:20px_20px] opacity-20" />
+          <div
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `radial-gradient(${t.envelopeTexture} 1px, transparent 1px)`,
+              backgroundSize: "20px 20px",
+            }}
+          />
 
           {/* Cover Image or gradient */}
           {coverImage ? (
@@ -127,26 +162,41 @@ export function EnvelopeUX({
               className="absolute inset-0 h-full w-full object-cover opacity-30"
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-stone-200 via-stone-100 to-amber-100/50" />
+            <div
+              className={`absolute inset-0 bg-gradient-to-br ${t.heroGradient}`}
+            />
           )}
 
           {/* Envelope border */}
-          <div className="absolute inset-3 rounded-lg border border-stone-300/50" />
+          <div
+            className="absolute inset-3 rounded-lg border"
+            style={{ borderColor: t.envelopeBorder }}
+          />
 
           {/* Envelope liner */}
-          <div className="absolute inset-6 rounded bg-gradient-to-br from-amber-100/40 via-transparent to-stone-200/30" />
+          <div
+            className={`absolute inset-6 rounded bg-gradient-to-br ${t.envelopeLiner}`}
+          />
 
           {/* Event preview text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center p-8 opacity-60">
             {hostName && (
-              <p className="mb-1 font-serif text-xs tracking-[0.2em] text-stone-500 uppercase">
+              <p
+                className={`mb-1 text-xs tracking-[0.2em] uppercase ${t.cardSubtitle}`}
+                style={{ fontFamily: t.fontClass === "font-sans" ? undefined : "serif" }}
+              >
                 {hostName}
               </p>
             )}
-            <p className="font-serif text-lg italic text-stone-600">
+            <p
+              className={`text-lg italic ${t.cardTitle}`}
+              style={{ fontFamily: t.fontClass === "font-sans" ? undefined : "serif" }}
+            >
               {eventTitle}
             </p>
-            <p className="mt-1 text-xs tracking-wider text-stone-500 capitalize">
+            <p
+              className={`mt-1 text-xs tracking-wider capitalize ${t.cardSubtitle}`}
+            >
               {eventType}
             </p>
           </div>
@@ -168,11 +218,17 @@ export function EnvelopeUX({
             <div
               className="h-full w-full rounded-b-none rounded-t-xl shadow-md"
               style={{
-                background: "linear-gradient(180deg, #e8dccf 0%, #dfceb8 100%)",
+                background: t.envelopeFlap,
                 clipPath: "polygon(0 0, 50% 100%, 100% 0)",
               }}
             >
-              <div className="absolute inset-0 rounded-t-xl bg-[radial-gradient(#c4b393_1px,transparent_1px)] bg-[length:16px_16px] opacity-20" />
+              <div
+                className="absolute inset-0 rounded-t-xl opacity-20"
+                style={{
+                  backgroundImage: `radial-gradient(${t.envelopeFlapTexture} 1px, transparent 1px)`,
+                  backgroundSize: "16px 16px",
+                }}
+              />
             </div>
 
             {/* Wax Seal */}
@@ -188,18 +244,19 @@ export function EnvelopeUX({
                 whileTap={state === "sealed" ? { scale: 0.95 } : undefined}
                 onClick={handleSealClick}
                 className="relative flex h-16 w-16 cursor-pointer items-center justify-center rounded-full shadow-lg"
-                style={{
-                  background:
-                    "radial-gradient(circle at 40% 40%, #c9a96e, #8b6914)",
-                }}
+                style={{ background: t.sealOuter }}
                 aria-label="Open invitation"
               >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-amber-300/40 bg-amber-100/10">
-                  <span className="font-serif text-xl text-amber-100 drop-shadow">
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border ${t.sealInner}`}
+                >
+                  <span className={`font-serif text-xl drop-shadow ${t.sealIcon}`}>
                     ✦
                   </span>
                 </div>
-                <div className="absolute top-2 left-2 h-4 w-4 rounded-full bg-white/15 blur-[2px]" />
+                <div
+                  className={`absolute top-2 left-2 h-4 w-4 rounded-full blur-[2px] ${t.sealHighlight}`}
+                />
               </motion.button>
             </div>
           </motion.div>
@@ -213,7 +270,7 @@ export function EnvelopeUX({
               : { opacity: 1 }
           }
           transition={{ delay: 0.8 }}
-          className="mt-6 text-center font-serif text-sm italic text-stone-500"
+          className={`mt-6 text-center font-serif text-sm italic ${isDark ? "text-stone-400" : "text-stone-500"}`}
         >
           Tap the wax seal to open your invitation
         </motion.p>
@@ -227,9 +284,12 @@ export function EnvelopeUX({
               exit={{ opacity: 0 }}
               transition={{ delay: 1.5, duration: 0.7, ease: "easeOut" }}
               onAnimationComplete={() => setState("open")}
-              className="absolute bottom-0 left-4 right-4 z-20 rounded-t-lg bg-white p-6 shadow-xl"
+              className={`absolute bottom-0 left-4 right-4 z-20 rounded-t-lg p-6 shadow-xl ${t.cardBg}`}
             >
-              <p className="text-center font-serif text-lg italic text-stone-400">
+              <p
+                className={`text-center text-lg italic ${t.cardSubtitle}`}
+                style={{ fontFamily: t.fontClass === "font-sans" ? undefined : "serif" }}
+              >
                 Opening...
               </p>
             </motion.div>

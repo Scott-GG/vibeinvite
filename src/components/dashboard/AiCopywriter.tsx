@@ -8,6 +8,7 @@ import {
   Check,
   Loader2,
   RefreshCw,
+  Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +29,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { generateInvitationCopy } from "@/lib/ai";
+import { saveInvitationMessage } from "@/app/dashboard/events/[id]/actions";
 
 const tones = [
   { value: "formal", label: "Formal", description: "Traditional & elegant" },
@@ -38,6 +40,7 @@ const tones = [
 ];
 
 interface AiCopywriterProps {
+  eventId: string;
   eventTitle: string;
   eventType: string;
   eventDate: string;
@@ -45,6 +48,7 @@ interface AiCopywriterProps {
 }
 
 export function AiCopywriter({
+  eventId,
   eventTitle,
   eventType,
   eventDate,
@@ -54,10 +58,13 @@ export function AiCopywriter({
   const [variants, setVariants] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [appliedIdx, setAppliedIdx] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
 
   async function handleGenerate() {
     setLoading(true);
     setVariants([]);
+    setAppliedIdx(null);
 
     try {
       const results = await generateInvitationCopy(
@@ -86,6 +93,20 @@ export function AiCopywriter({
     toast.success("Copied to clipboard");
   }
 
+  async function applyToInvitation(text: string, idx: number) {
+    setSaving(true);
+    try {
+      await saveInvitationMessage(eventId, text);
+      setAppliedIdx(idx);
+      toast.success("Applied to invitation! Guests will see this message.");
+    } catch (e) {
+      toast.error(
+        e instanceof Error ? e.message : "Failed to save invitation message",
+      );
+    }
+    setSaving(false);
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -94,7 +115,7 @@ export function AiCopywriter({
           AI Invitation Copywriter
         </CardTitle>
         <CardDescription>
-          Generate elegant invitation text in your chosen tone
+          Generate elegant invitation text and apply it directly to your guest invitations
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -142,16 +163,34 @@ export function AiCopywriter({
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
-                  className="group relative rounded-lg border bg-stone-50 p-4"
+                  className={`group relative rounded-lg border p-4 transition-colors ${
+                    appliedIdx === i
+                      ? "border-emerald-300 bg-emerald-50"
+                      : "border-stone-200 bg-stone-50"
+                  }`}
                 >
-                  <p className="pr-12 font-serif text-sm leading-relaxed text-stone-700 italic">
+                  <p className="pr-20 font-serif text-sm leading-relaxed text-stone-700 italic">
                     {text}
                   </p>
                   <div className="absolute top-3 right-3 flex gap-1">
                     <Button
                       variant="ghost"
                       size="icon-xs"
+                      onClick={() => applyToInvitation(text, i)}
+                      disabled={saving}
+                      title="Apply to invitation"
+                    >
+                      {appliedIdx === i ? (
+                        <Check className="h-3.5 w-3.5 text-emerald-600" />
+                      ) : (
+                        <Send className="h-3.5 w-3.5" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
                       onClick={() => copyVariant(text, i)}
+                      title="Copy to clipboard"
                     >
                       {copiedIdx === i ? (
                         <Check className="h-3.5 w-3.5 text-emerald-600" />
