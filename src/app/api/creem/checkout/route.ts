@@ -19,16 +19,8 @@ export async function POST(request: NextRequest) {
 
     const isPro = type === "pro_event";
     const productId = isPro
-      ? process.env.CREEM_PRO_PRODUCT_ID
-      : process.env.CREEM_UNLIMITED_PRODUCT_ID;
-
-    if (!productId) {
-      console.error("[creem checkout] Missing product ID for type:", type);
-      return NextResponse.json(
-        { error: "Server configuration error — missing product ID" },
-        { status: 500 },
-      );
-    }
+      ? (process.env.CREEM_PRO_PRODUCT_ID ?? "prod_3mzm4qaKsRTTbYnjvuAdRa")
+      : (process.env.CREEM_UNLIMITED_PRODUCT_ID ?? "prod_7gSREGYaZLeLv1G15Ixv5A");
 
     const host = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
 
