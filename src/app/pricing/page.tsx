@@ -5,47 +5,54 @@ import { cn } from "@/lib/utils";
 
 const plans = [
   {
-    name: "Free",
+    name: "Starter",
     price: "$0",
     period: "forever",
-    description: "Perfect for trying it out",
+    bestFor: "Trying it out",
+    description: "Everything you need for a small, intimate gathering.",
     features: [
-      "Up to 15 guests per event",
-      "Classic invitation theme",
-      "RSVP management",
+      "Up to 15 guests",
+      "Classic Elegance theme",
+      "RSVP tracking & management",
       "Email invitations",
+      "Real-time guest stats",
     ],
     cta: "Get Started Free",
     href: "/login",
     highlight: false,
   },
   {
-    name: "Pro Event",
+    name: "Signature",
     price: "$29",
     period: "per event",
-    description: "Make it unforgettable",
+    bestFor: "One unforgettable event",
+    description: "Premium themes, unlimited guests, and AI that writes for you.",
     features: [
       "Unlimited guests",
-      "All premium themes",
-      "AI copywriter",
+      "All 6 premium themes",
+      "AI invitation copywriter",
       "Smart seating chart",
-      "Dietary preferences",
-      "Data export",
+      "Dietary preference tracking",
+      "Guest data export",
+      "Wax-seal envelope animation",
     ],
     cta: "Create Event First",
     href: "/login",
     highlight: true,
   },
   {
-    name: "Unlimited",
+    name: "Host",
     price: "$9.99",
     period: "per month",
-    description: "For hosts and planners",
+    bestFor: "Serial hosts & planners",
+    description: "Every feature, every event — all year. Built for people who host often.",
     features: [
-      "Everything in Pro",
+      "Everything in Signature",
       "Unlimited events",
-      "Priority support",
-      "Early access to new features",
+      "Priority email support",
+      "Early access to new themes",
+      "Custom domain support",
+      "Background music for invitations",
     ],
     cta: "Subscribe Now",
     href: "/login",
@@ -70,13 +77,16 @@ export default function PricingPage() {
       </header>
 
       {/* Hero */}
-      <section className="px-6 pb-16 pt-16 text-center">
-        <h1 className="text-4xl font-semibold tracking-tight text-stone-900">
-          Simple, transparent pricing
+      <section className="px-6 pb-12 pt-16 text-center">
+        <span className="inline-block rounded-full border border-amber-200 bg-amber-50 px-4 py-1 text-xs font-medium tracking-wide text-amber-800 uppercase">
+          Pricing
+        </span>
+        <h1 className="mt-4 font-serif text-4xl font-semibold tracking-tight text-stone-900">
+          Choose the right plan for your event
         </h1>
-        <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-          Choose the right plan for your event. Upgrade anytime — no hidden
-          fees.
+        <p className="mx-auto mt-3 max-w-lg text-stone-500">
+          Start free. Upgrade when you need more guests, premium themes, and
+          AI-powered copy. No hidden fees, cancel anytime.
         </p>
       </section>
 
@@ -87,36 +97,46 @@ export default function PricingPage() {
             <div
               key={plan.name}
               className={cn(
-                "relative flex flex-col rounded-2xl border bg-white p-8 shadow-sm transition-shadow hover:shadow-md",
+                "relative flex flex-col rounded-2xl border bg-white p-8 shadow-sm transition-shadow hover:shadow-lg",
                 plan.highlight &&
-                  "border-amber-300 ring-2 ring-amber-100 shadow-lg",
+                  "border-amber-300 ring-2 ring-amber-100 shadow-xl",
               )}
             >
               {plan.highlight && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-100 px-3 py-0.5 text-xs font-medium text-amber-800">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-100 px-4 py-0.5 text-xs font-medium text-amber-800">
                   Most Popular
                 </span>
               )}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground">
+
+              <div className="mb-2">
+                <span className="text-xs font-medium tracking-wide text-stone-400 uppercase">
+                  {plan.bestFor}
+                </span>
+              </div>
+
+              <div className="mb-4">
+                <h3 className="text-xl font-semibold">{plan.name}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-stone-500">
                   {plan.description}
                 </p>
               </div>
+
               <div className="mb-6">
                 <span className="text-4xl font-bold tracking-tight">
                   {plan.price}
                 </span>
-                <span className="text-muted-foreground"> /{plan.period}</span>
+                <span className="text-stone-400"> /{plan.period}</span>
               </div>
+
               <ul className="mb-8 flex-1 space-y-3">
                 {plan.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                    {f}
+                    <span className="text-stone-600">{f}</span>
                   </li>
                 ))}
               </ul>
+
               <Link
                 href={plan.href}
                 className={cn(
@@ -135,8 +155,10 @@ export default function PricingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-8 text-center text-xs text-muted-foreground">
-        Powered by VibeInvite — Premium Digital Invitations
+      <footer className="border-t py-8 text-center text-xs text-stone-400">
+        <span className="font-medium text-stone-500">VibeInvite</span>
+        &nbsp;&mdash; Premium Digital Invitations. Crafted for moments that
+        matter.
       </footer>
     </div>
   );

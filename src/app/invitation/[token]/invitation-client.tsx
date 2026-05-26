@@ -19,6 +19,7 @@ interface InvitationClientProps {
   eventTitle: string;
   eventType: string;
   eventDate: string;
+  eventDateRaw: Date;
   eventLocation?: string;
   plusOneAllowed: boolean;
   theme: string;
@@ -31,6 +32,7 @@ export function InvitationClient({
   eventTitle,
   eventType,
   eventDate,
+  eventDateRaw,
   eventLocation,
   plusOneAllowed,
   theme: _theme,
@@ -50,6 +52,7 @@ export function InvitationClient({
       eventTitle={eventTitle}
       eventType={eventType}
       coverImage={coverImage}
+      eventDate={eventDateRaw}
     >
       <RsvpForm
         guestName={guestName}

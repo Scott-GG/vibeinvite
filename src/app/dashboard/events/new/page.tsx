@@ -28,6 +28,9 @@ import {
   PartyPopper,
   Heart,
   GlassWater,
+  Moon,
+  Flower2,
+  Waves,
   Check,
   Lock,
 } from "lucide-react";
@@ -60,6 +63,30 @@ const themes = [
     description: "Clean lines with bold typography",
     icon: GlassWater,
     colors: ["#2d2d2d", "#ffffff", "#e8e8e8"],
+    pro: true,
+  },
+  {
+    id: "midnight",
+    name: "Midnight Noir",
+    description: "Dramatic black with gold — for galas and black-tie events",
+    icon: Moon,
+    colors: ["#0d0d0d", "#f0e8d8", "#c9a96e"],
+    pro: true,
+  },
+  {
+    id: "botanical",
+    name: "Botanical",
+    description: "Earthy greens and warm neutrals inspired by nature",
+    icon: Flower2,
+    colors: ["#3a5a40", "#f5f0e8", "#a3b18a"],
+    pro: true,
+  },
+  {
+    id: "coastal",
+    name: "Coastal",
+    description: "Ocean blues and sandy beiges for destination celebrations",
+    icon: Waves,
+    colors: ["#457b9d", "#fefaec", "#a8dadc"],
     pro: true,
   },
 ];
@@ -299,8 +326,11 @@ export default function NewEventPage() {
               {isFree && (
                 <div className="mb-4 flex items-center justify-between rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
                   <span>
-                    Upgrade to unlock <strong>Romantic Garden</strong> and{" "}
-                    <strong>Modern Minimal</strong> themes.
+                    Upgrade to unlock <strong>Romantic Garden</strong>,{" "}
+                    <strong>Modern Minimal</strong>,{" "}
+                    <strong>Midnight Noir</strong>,{" "}
+                    <strong>Botanical</strong>, and{" "}
+                    <strong>Coastal</strong> themes.
                   </span>
                   <UpgradeButton
                     type="subscription"

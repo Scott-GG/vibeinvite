@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,12 +14,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Mail, LogIn } from "lucide-react";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
-  const router = useRouter();
   const supabase = createClient();
 
   async function handleMagicLink(e: React.FormEvent) {
@@ -60,13 +58,18 @@ export default function LoginPage() {
 
   if (magicLinkSent) {
     return (
-      <Card className="border-0 shadow-xl">
-        <CardHeader className="text-center">
+      <Card className="border-0 shadow-2xl ring-1 ring-stone-200/60">
+        <CardHeader className="space-y-1 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100">
+            <Mail className="h-7 w-7 text-emerald-700" />
+          </div>
           <CardTitle className="text-2xl">Check Your Email</CardTitle>
-          <CardDescription>
-            We sent a magic link to <strong>{email}</strong>. Click the link to
-            sign in.
+          <CardDescription className="text-base">
+            We sent a magic link to <strong>{email}</strong>
           </CardDescription>
+          <p className="text-sm text-stone-400">
+            Click the link in the email to sign in. No password needed.
+          </p>
         </CardHeader>
         <CardContent className="text-center">
           <Button variant="outline" onClick={() => setMagicLinkSent(false)}>
@@ -78,20 +81,26 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="border-0 shadow-xl">
-      <CardHeader className="text-center">
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-stone-900">
-          <Mail className="h-6 w-6 text-white" />
+    <Card className="border-0 shadow-2xl ring-1 ring-stone-200/60">
+      <CardHeader className="space-y-1 text-center">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-900 shadow-lg shadow-stone-900/20">
+          <svg
+            className="h-7 w-7 text-amber-500"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 2v.5l8 5 8-5V6H4zm0 12h16V8.5l-7.3 4.57a1 1 0 01-1.4 0L4 8.5V18z" />
+          </svg>
         </div>
         <CardTitle className="text-2xl">Welcome to VibeInvite</CardTitle>
-        <CardDescription>
-          Sign in to create and manage your premium invitations
+        <CardDescription className="text-base">
+          Sign in to create beautiful, paper-like digital invitations
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button
           variant="outline"
-          className="w-full"
+          className="h-12 w-full border-stone-300 bg-white text-sm font-medium shadow-sm transition-shadow hover:shadow-md"
           onClick={handleGoogleSignIn}
         >
           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -117,13 +126,15 @@ export default function LoginPage() {
 
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground">OR</span>
+          <span className="text-xs font-medium text-stone-400">OR</span>
           <Separator className="flex-1" />
         </div>
 
         <form onSubmit={handleMagicLink} className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="email">Email address</Label>
+            <Label htmlFor="email" className="text-sm font-medium">
+              Email address
+            </Label>
             <Input
               id="email"
               type="email"
@@ -131,9 +142,14 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="h-12"
             />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button
+            type="submit"
+            className="h-12 w-full shadow-sm transition-shadow hover:shadow-md"
+            disabled={loading}
+          >
             <LogIn className="mr-2 h-4 w-4" />
             {loading ? "Sending link..." : "Send Magic Link"}
           </Button>

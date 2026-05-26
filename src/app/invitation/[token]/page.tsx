@@ -77,6 +77,7 @@ export default async function InvitationPage({
         month: "long",
         day: "numeric",
       })}
+      eventDateRaw={new Date(event.event_date)}
       eventLocation={event.location_name ?? undefined}
       plusOneAllowed={guest.plus_one_allowed}
       theme={theme}

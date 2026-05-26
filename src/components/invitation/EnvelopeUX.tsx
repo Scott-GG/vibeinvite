@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CountdownTimer } from "./CountdownTimer";
 
 type EnvelopeState = "sealed" | "opening" | "open";
 
@@ -10,33 +11,80 @@ interface EnvelopeUXProps {
   eventType: string;
   hostName?: string;
   coverImage?: string;
+  eventDate?: Date;
   children: React.ReactNode;
 }
+
+const floatingParticles = Array.from({ length: 12 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  delay: Math.random() * 1.5,
+  duration: Math.random() * 2 + 2,
+  size: Math.random() * 4 + 2,
+  opacity: Math.random() * 0.3 + 0.1,
+}));
 
 export function EnvelopeUX({
   eventTitle,
   eventType,
   hostName,
   coverImage,
+  eventDate,
   children,
 }: EnvelopeUXProps) {
   const [state, setState] = useState<EnvelopeState>("sealed");
 
-  function handleSealClick() {
-    // The seal's onAnimationComplete will advance to "opening"
-    // We use a separate call so the seal has time to animate out
-    setState((prev) => (prev === "sealed" ? "opening" : prev));
-  }
+  const handleSealClick = useCallback(() => {
+    if (state === "sealed") {
+      setState("opening");
+    }
+  }, [state]);
 
   if (state === "open") {
     return (
-      <div className="flex min-h-screen items-start justify-center bg-stone-100 px-4 py-8 sm:py-16">
+      <div className="relative flex min-h-screen items-start justify-center bg-stone-100 px-4 py-8 sm:py-16">
+        {/* Floating particles background */}
+        <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+          {floatingParticles.map((p) => (
+            <motion.div
+              key={p.id}
+              className="absolute rounded-full"
+              style={{
+                left: `${p.x}%`,
+                bottom: -10,
+                width: p.size,
+                height: p.size,
+                backgroundColor: "#c9a96e",
+              }}
+              initial={{ y: 0, opacity: 0 }}
+              animate={{
+                y: -(window.innerHeight * 0.8),
+                opacity: [0, p.opacity, 0],
+              }}
+              transition={{
+                duration: p.duration,
+                delay: p.delay,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
+          ))}
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="w-full max-w-lg"
         >
+          {eventDate && (
+            <div className="mb-8">
+              <p className="mb-3 text-center text-xs tracking-[0.2em] text-stone-400 uppercase">
+                The celebration begins in
+              </p>
+              <CountdownTimer eventDate={eventDate} />
+            </div>
+          )}
           {children}
         </motion.div>
       </div>
@@ -115,7 +163,7 @@ export function EnvelopeUX({
               <div className="absolute inset-0 rounded-t-xl bg-[radial-gradient(#c4b393_1px,transparent_1px)] bg-[length:16px_16px] opacity-20" />
             </div>
 
-            {/* Wax Seal — stays in DOM, animates out via scale/opacity */}
+            {/* Wax Seal */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
               <motion.button
                 animate={
@@ -153,25 +201,28 @@ export function EnvelopeUX({
               : { opacity: 1 }
           }
           transition={{ delay: 0.8 }}
-          className="mt-6 text-center text-sm text-stone-500"
+          className="mt-6 text-center font-serif text-sm italic text-stone-500"
         >
-          Tap the seal to open your invitation
+          Tap the wax seal to open your invitation
         </motion.p>
 
         {/* Card sliding out after flap opens */}
-        {state === "opening" && (
-          <motion.div
-            initial={{ opacity: 0, y: -60 }}
-            animate={{ opacity: 1, y: -20 }}
-            transition={{ delay: 1.5, duration: 0.7, ease: "easeOut" }}
-            onAnimationComplete={() => setState("open")}
-            className="absolute bottom-0 left-4 right-4 z-20 rounded-t-lg bg-white p-6 shadow-xl"
-          >
-            <p className="text-center font-serif text-lg italic text-stone-400">
-              Opening...
-            </p>
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {state === "opening" && (
+            <motion.div
+              initial={{ opacity: 0, y: -60 }}
+              animate={{ opacity: 1, y: -20 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 1.5, duration: 0.7, ease: "easeOut" }}
+              onAnimationComplete={() => setState("open")}
+              className="absolute bottom-0 left-4 right-4 z-20 rounded-t-lg bg-white p-6 shadow-xl"
+            >
+              <p className="text-center font-serif text-lg italic text-stone-400">
+                Opening...
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

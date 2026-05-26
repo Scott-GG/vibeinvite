@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, Users, Utensils, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { ConfettiEffect } from "./ConfettiEffect";
 
 export interface RsvpFormData {
   status: "accepted" | "declined";
@@ -48,6 +49,7 @@ export function RsvpForm({
   const [dietary, setDietary] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   async function handleSubmit() {
     if (!status) return;
@@ -61,182 +63,230 @@ export function RsvpForm({
 
     setSubmitting(false);
     setSubmitted(true);
-    toast.success(
-      status === "accepted"
-        ? "You're on the list! We can't wait to celebrate with you."
-        : "Response recorded. You'll be missed!",
-    );
+
+    if (status === "accepted") {
+      setShowConfetti(true);
+      toast.success("You're on the list! We can't wait to celebrate with you.");
+    } else {
+      toast("Response recorded. You'll be missed!", {
+        description: "Thank you for letting us know.",
+      });
+    }
   }
 
-  if (submitted) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl bg-white p-8 text-center shadow-xl"
-      >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-          className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100"
-        >
-          {status === "accepted" ? (
-            <Check className="h-8 w-8 text-emerald-600" />
-          ) : (
-            <X className="h-8 w-8 text-rose-600" />
-          )}
-        </motion.div>
-        <h2 className="mb-2 font-serif text-2xl text-stone-800">
-          {status === "accepted" ? "See you there!" : "Response Received"}
-        </h2>
-        <p className="text-stone-500">
-          {status === "accepted"
-            ? `Thank you, ${guestName}. We've saved your spot.`
-            : `Thank you for letting us know, ${guestName}.`}
-        </p>
-      </motion.div>
-    );
-  }
+  // First name for greeting
+  const firstName = guestName.split(" ")[0];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="rounded-xl bg-white p-6 shadow-xl sm:p-8"
-    >
-      {/* Event header */}
-      <div className="mb-8 text-center">
-        <p className="mb-1 font-serif text-xs tracking-[0.25em] text-stone-400 uppercase">
-          You are invited to
-        </p>
-        <h1 className="mb-1 font-serif text-2xl text-stone-800 sm:text-3xl">
-          {eventTitle}
-        </h1>
-        <p className="text-sm text-stone-500">{eventDate}</p>
-        {eventLocation && (
-          <p className="text-sm text-stone-400">{eventLocation}</p>
+    <>
+      <ConfettiEffect active={showConfetti} />
+
+      <AnimatePresence mode="wait">
+        {submitted ? (
+          <motion.div
+            key="submitted"
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="rounded-2xl bg-white p-8 text-center shadow-xl ring-1 ring-stone-200/60"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+              className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-stone-100"
+            >
+              {status === "accepted" ? (
+                <Check className="h-10 w-10 text-emerald-600" />
+              ) : (
+                <X className="h-10 w-10 text-rose-500" />
+              )}
+            </motion.div>
+            <h2 className="mb-2 font-serif text-2xl text-stone-800 sm:text-3xl">
+              {status === "accepted" ? "See you there!" : "Response Received"}
+            </h2>
+            <p className="mx-auto max-w-sm text-stone-500 leading-relaxed">
+              {status === "accepted"
+                ? `Thank you, ${firstName}. We've saved your spot at ${eventTitle}.`
+                : `Thank you for letting us know, ${firstName}. You'll be missed at ${eventTitle}.`}
+            </p>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="rounded-2xl bg-white p-6 shadow-xl ring-1 ring-stone-200/60 sm:p-8"
+          >
+            {/* Event header */}
+            <div className="mb-8 text-center">
+              <p className="mb-1 font-serif text-xs tracking-[0.25em] text-stone-400 uppercase">
+                You are cordially invited to
+              </p>
+              <h1 className="mb-1 font-serif text-3xl text-stone-800">
+                {eventTitle}
+              </h1>
+              <p className="text-sm text-stone-500">{eventDate}</p>
+              {eventLocation && (
+                <p className="text-sm text-stone-400">{eventLocation}</p>
+              )}
+            </div>
+
+            {/* Gold divider */}
+            <div className="mb-8 flex items-center justify-center gap-3">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-stone-200" />
+              <span className="text-amber-600 text-xs">&#9670;</span>
+              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-stone-200" />
+            </div>
+
+            {/* Guest greeting */}
+            <p className="mb-8 text-center font-serif text-lg text-stone-600">
+              Dear{" "}
+              <span className="font-semibold text-stone-800">{guestName}</span>,
+            </p>
+
+            {/* RSVP buttons */}
+            <div className="mb-8">
+              <Label className="mb-3 block text-center text-sm text-stone-500">
+                Will you be joining us?
+              </Label>
+              <div className="grid grid-cols-2 gap-3">
+                <motion.button
+                  type="button"
+                  whileHover={status !== "accepted" ? { scale: 1.02 } : {}}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setStatus("accepted")}
+                  className={`flex flex-col items-center gap-2 rounded-xl border-2 p-5 transition-all ${
+                    status === "accepted"
+                      ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-[0_0_20px_rgba(16,185,129,0.15)]"
+                      : "border-stone-200 hover:border-emerald-300 hover:bg-emerald-50/50"
+                  }`}
+                >
+                  <Check
+                    className={`h-6 w-6 transition-colors ${
+                      status === "accepted"
+                        ? "text-emerald-600"
+                        : "text-stone-400"
+                    }`}
+                  />
+                  <span className="font-medium text-sm">Accept</span>
+                  <span className="text-xs opacity-70">with Pleasure</span>
+                </motion.button>
+
+                <motion.button
+                  type="button"
+                  whileHover={status !== "declined" ? { scale: 1.02 } : {}}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setStatus("declined")}
+                  className={`flex flex-col items-center gap-2 rounded-xl border-2 p-5 transition-all ${
+                    status === "declined"
+                      ? "border-rose-400 bg-rose-50 text-rose-700"
+                      : "border-stone-200 hover:border-rose-300 hover:bg-rose-50/50"
+                  }`}
+                >
+                  <X
+                    className={`h-6 w-6 transition-colors ${
+                      status === "declined"
+                        ? "text-rose-500"
+                        : "text-stone-400"
+                    }`}
+                  />
+                  <span className="font-medium text-sm">Decline</span>
+                  <span className="text-xs opacity-70">with Regret</span>
+                </motion.button>
+              </div>
+            </div>
+
+            <AnimatePresence>
+              {/* Plus One */}
+              {status === "accepted" && plusOneAllowed && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="h-4 w-4 text-stone-400" />
+                    <Label className="text-sm text-stone-600">Plus One</Label>
+                  </div>
+                  <Input
+                    placeholder="Your guest's full name"
+                    value={plusOneName}
+                    onChange={(e) => setPlusOneName(e.target.value)}
+                  />
+                </motion.div>
+              )}
+
+              {/* Dietary dropdown */}
+              {status === "accepted" && dietaryOptions.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Utensils className="h-4 w-4 text-stone-400" />
+                    <Label className="text-sm text-stone-600">
+                      Dietary Preferences
+                    </Label>
+                  </div>
+                  <Select
+                    value={dietary}
+                    onValueChange={(v) => setDietary(v ?? "")}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your meal preference" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {dietaryOptions.map((opt) => (
+                        <SelectItem key={opt} value={opt}>
+                          {opt}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </motion.div>
+              )}
+
+              {/* Dietary notes */}
+              {status === "accepted" && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Heart className="h-4 w-4 text-stone-400" />
+                    <Label className="text-sm text-stone-600">
+                      Allergies or Special Requests
+                    </Label>
+                  </div>
+                  <Textarea
+                    placeholder="Any dietary restrictions or notes for the host..."
+                    value={dietary}
+                    onChange={(e) => setDietary(e.target.value)}
+                    rows={2}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Submit */}
+            <Button
+              onClick={handleSubmit}
+              disabled={!status || submitting}
+              size="lg"
+              className="h-12 w-full text-base shadow-sm transition-all hover:shadow-md"
+            >
+              {submitting ? "Sending..." : "Send Response"}
+            </Button>
+          </motion.div>
         )}
-      </div>
-
-      <Separator className="mb-8" />
-
-      {/* Guest greeting */}
-      <p className="mb-6 text-center font-serif text-lg text-stone-600">
-        Dear <span className="text-stone-800">{guestName}</span>,
-      </p>
-
-      {/* RSVP buttons */}
-      <div className="mb-8">
-        <Label className="mb-3 block text-center text-sm text-stone-500">
-          Will you be joining us?
-        </Label>
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => setStatus("accepted")}
-            className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
-              status === "accepted"
-                ? "border-emerald-600 bg-emerald-50 text-emerald-700"
-                : "border-stone-200 hover:border-emerald-300 hover:bg-emerald-50/50"
-            }`}
-          >
-            <Check className="h-6 w-6" />
-            <span className="font-medium text-sm">Accept</span>
-            <span className="text-xs opacity-70">with Pleasure</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setStatus("declined")}
-            className={`flex flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all ${
-              status === "declined"
-                ? "border-rose-600 bg-rose-50 text-rose-700"
-                : "border-stone-200 hover:border-rose-300 hover:bg-rose-50/50"
-            }`}
-          >
-            <X className="h-6 w-6" />
-            <span className="font-medium text-sm">Decline</span>
-            <span className="text-xs opacity-70">with Regret</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Plus One */}
-      {status === "accepted" && plusOneAllowed && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          className="mb-6"
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Users className="h-4 w-4 text-stone-500" />
-            <Label className="text-sm text-stone-600">Plus One</Label>
-          </div>
-          <Input
-            placeholder="Your guest's full name"
-            value={plusOneName}
-            onChange={(e) => setPlusOneName(e.target.value)}
-          />
-        </motion.div>
-      )}
-
-      {/* Dietary */}
-      {status === "accepted" && dietaryOptions.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          className="mb-6"
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Utensils className="h-4 w-4 text-stone-500" />
-            <Label className="text-sm text-stone-600">Dietary Preferences</Label>
-          </div>
-          <Select value={dietary} onValueChange={(v) => setDietary(v ?? "")}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select your meal preference" />
-            </SelectTrigger>
-            <SelectContent>
-              {dietaryOptions.map((opt) => (
-                <SelectItem key={opt} value={opt}>
-                  {opt}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </motion.div>
-      )}
-
-      {/* Dietary free-text (always available) */}
-      {status === "accepted" && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          className="mb-6"
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <Heart className="h-4 w-4 text-stone-500" />
-            <Label className="text-sm text-stone-600">
-              Dietary Restrictions or Notes
-            </Label>
-          </div>
-          <Textarea
-            placeholder="Any allergies or special requests..."
-            value={dietary}
-            onChange={(e) => setDietary(e.target.value)}
-            rows={2}
-          />
-        </motion.div>
-      )}
-
-      {/* Submit */}
-      <Button
-        onClick={handleSubmit}
-        disabled={!status || submitting}
-        className="w-full"
-      >
-        {submitting ? "Sending..." : "Send Response"}
-      </Button>
-    </motion.div>
+      </AnimatePresence>
+    </>
   );
 }
