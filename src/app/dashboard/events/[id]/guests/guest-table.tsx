@@ -33,6 +33,9 @@ type GuestRow = {
   phone: string | null;
   status: string;
   plus_one_allowed: boolean;
+  plus_one_count: number;
+  dietary_restrictions: string | null;
+  custom_responses: Record<string, unknown> | null;
   access_token: string;
 };
 
@@ -153,13 +156,22 @@ export function GuestTable({ eventId, guests, canAddMore = true }: GuestTablePro
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Contact</TableHead>
-                <TableHead>Plus One</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>+1</TableHead>
+                <TableHead>Dietary</TableHead>
                 <TableHead className="w-16" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {guests.map((guest) => (
+              {guests.map((guest) => {
+                const plusOneName =
+                  guest.custom_responses &&
+                  typeof guest.custom_responses === "object" &&
+                  "plus_one_name" in guest.custom_responses
+                    ? String(guest.custom_responses.plus_one_name)
+                    : null;
+
+                return (
                 <TableRow key={guest.id}>
                   <TableCell className="font-medium">
                     {guest.first_name} {guest.last_name}
@@ -180,12 +192,25 @@ export function GuestTable({ eventId, guests, canAddMore = true }: GuestTablePro
                     </div>
                   </TableCell>
                   <TableCell>
-                    {guest.plus_one_allowed ? "Yes" : "No"}
-                  </TableCell>
-                  <TableCell>
                     <Badge variant={statusColors[guest.status] ?? "outline"}>
                       {statusLabels[guest.status] ?? guest.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {guest.plus_one_count > 0 && plusOneName ? (
+                      <span className="text-xs">{plusOneName}</span>
+                    ) : guest.plus_one_allowed ? (
+                      <span className="text-xs text-stone-400">Open</span>
+                    ) : (
+                      <span className="text-xs text-stone-300">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {guest.dietary_restrictions ? (
+                      <span className="text-xs">{guest.dietary_restrictions}</span>
+                    ) : (
+                      <span className="text-xs text-stone-300">—</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Button
@@ -197,7 +222,8 @@ export function GuestTable({ eventId, guests, canAddMore = true }: GuestTablePro
                     </Button>
                   </TableCell>
                 </TableRow>
-              ))}
+                );
+              })}
             </TableBody>
           </Table>
         </div>

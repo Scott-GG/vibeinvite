@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, requireUser } from "@/lib/supabase/server";
 
 const statusLabels: Record<string, string> = {
   accepted: "Attending",
@@ -27,14 +27,12 @@ const statusColors: Record<
 
 export default async function GuestsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await requireUser();
 
   const { data: events } = await supabase
     .from("events")
     .select("id, title, event_date")
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .order("event_date", { ascending: true });
 
   if (!events || events.length === 0) {

@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, requireUser } from "@/lib/supabase/server";
 import { GuestTable } from "./guest-table";
 
 export default async function GuestsPage({
@@ -21,22 +21,20 @@ export default async function GuestsPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await requireUser();
 
   const { data: event } = await supabase
     .from("events")
     .select("title, is_pro")
     .eq("id", id)
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .single();
 
   // Check subscription tier
   const { data: profile } = await supabase
     .from("profiles")
     .select("subscription_tier")
-    .eq("id", user!.id)
+    .eq("id", user.id)
     .single();
 
   const isFree = (profile?.subscription_tier ?? "free") === "free" && !event?.is_pro;

@@ -21,6 +21,7 @@ export async function submitRsvp(payload: RsvpPayload) {
   if (payload.status === "accepted") {
     if (payload.plus_one_name) {
       update.plus_one_count = 1;
+      update.custom_responses = { plus_one_name: payload.plus_one_name };
     }
     if (payload.dietary_restrictions) {
       update.dietary_restrictions = payload.dietary_restrictions;
