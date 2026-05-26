@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { ArrowLeft, Send } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -30,6 +31,8 @@ export default async function InvitePage({
     .eq("id", id)
     .eq("user_id", user!.id)
     .single();
+
+  if (!event) notFound();
 
   const { data: guests } = await supabase
     .from("guests")

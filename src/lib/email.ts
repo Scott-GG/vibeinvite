@@ -158,6 +158,19 @@ export async function sendInvitationEmail({
     html,
   });
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error("[email] Resend error:", JSON.stringify(error));
+    // Check for common domain verification issues
+    const msg =
+      typeof error === "object" && error !== null && "message" in error
+        ? (error as { message: string }).message
+        : "Unknown email error";
+    if (msg.includes("domain") || msg.includes("verified")) {
+      throw new Error(
+        `Email domain not verified. Verify your domain in Resend: https://resend.com/domains (${msg})`,
+      );
+    }
+    throw new Error(msg);
+  }
   return data;
 }

@@ -6,6 +6,7 @@ export async function proxy(request: NextRequest) {
 
   // Public routes — no auth required
   const isPublic =
+    pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/auth") ||
     pathname.startsWith("/invitation/") ||

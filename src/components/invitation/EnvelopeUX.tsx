@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CountdownTimer } from "./CountdownTimer";
 
@@ -15,15 +15,6 @@ interface EnvelopeUXProps {
   children: React.ReactNode;
 }
 
-const floatingParticles = Array.from({ length: 12 }, (_, i) => ({
-  id: i,
-  x: Math.random() * 100,
-  delay: Math.random() * 1.5,
-  duration: Math.random() * 2 + 2,
-  size: Math.random() * 4 + 2,
-  opacity: Math.random() * 0.3 + 0.1,
-}));
-
 export function EnvelopeUX({
   eventTitle,
   eventType,
@@ -33,6 +24,25 @@ export function EnvelopeUX({
   children,
 }: EnvelopeUXProps) {
   const [state, setState] = useState<EnvelopeState>("sealed");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Generate particles only on client to avoid hydration mismatch
+  const floatingParticles = useMemo(
+    () =>
+      Array.from({ length: 12 }, (_, i) => ({
+        id: i,
+        x: Math.random() * 100,
+        delay: Math.random() * 1.5,
+        duration: Math.random() * 2 + 2,
+        size: Math.random() * 4 + 2,
+        opacity: Math.random() * 0.3 + 0.1,
+      })),
+    [],
+  );
 
   const handleSealClick = useCallback(() => {
     if (state === "sealed") {
@@ -43,33 +53,35 @@ export function EnvelopeUX({
   if (state === "open") {
     return (
       <div className="relative flex min-h-screen items-start justify-center bg-stone-100 px-4 py-8 sm:py-16">
-        {/* Floating particles background */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
-          {floatingParticles.map((p) => (
-            <motion.div
-              key={p.id}
-              className="absolute rounded-full"
-              style={{
-                left: `${p.x}%`,
-                bottom: -10,
-                width: p.size,
-                height: p.size,
-                backgroundColor: "#c9a96e",
-              }}
-              initial={{ y: 0, opacity: 0 }}
-              animate={{
-                y: -(window.innerHeight * 0.8),
-                opacity: [0, p.opacity, 0],
-              }}
-              transition={{
-                duration: p.duration,
-                delay: p.delay,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          ))}
-        </div>
+        {/* Floating particles background — only on client to avoid SSR window access */}
+        {mounted && (
+          <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden>
+            {floatingParticles.map((p) => (
+              <motion.div
+                key={p.id}
+                className="absolute rounded-full"
+                style={{
+                  left: `${p.x}%`,
+                  bottom: -10,
+                  width: p.size,
+                  height: p.size,
+                  backgroundColor: "#c9a96e",
+                }}
+                initial={{ y: 0, opacity: 0 }}
+                animate={{
+                  y: "-80vh",
+                  opacity: [0, p.opacity, 0],
+                }}
+                transition={{
+                  duration: p.duration,
+                  delay: p.delay,
+                  repeat: Infinity,
+                  ease: "linear",
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}
