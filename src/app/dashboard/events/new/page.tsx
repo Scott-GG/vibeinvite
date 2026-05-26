@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -100,7 +100,7 @@ export default function NewEventPage() {
   const [tier, setTier] = useState<string>("free");
 
   // Fetch user's subscription tier
-  useState(() => {
+  useEffect(() => {
     supabase
       .from("profiles")
       .select("subscription_tier")
@@ -108,7 +108,7 @@ export default function NewEventPage() {
       .then(({ data }) => {
         if (data) setTier(data.subscription_tier);
       });
-  });
+  }, [supabase]);
 
   const isFree = tier === "free";
 
