@@ -73,22 +73,29 @@ export function RsvpForm({
     if (!status) return;
     setSubmitting(true);
 
-    await onSubmit({
-      status,
-      plus_one_name: plusOneName || undefined,
-      dietary_restrictions: dietary || undefined,
-    });
-
-    setSubmitting(false);
-    setSubmitted(true);
-
-    if (status === "accepted") {
-      setShowConfetti(true);
-      toast.success("You're on the list! We can't wait to celebrate with you.");
-    } else {
-      toast("Response recorded. You'll be missed!", {
-        description: "Thank you for letting us know.",
+    try {
+      await onSubmit({
+        status,
+        plus_one_name: plusOneName || undefined,
+        dietary_restrictions: dietary || undefined,
       });
+
+      setSubmitting(false);
+      setSubmitted(true);
+
+      if (status === "accepted") {
+        setShowConfetti(true);
+        toast.success("You're on the list! We can't wait to celebrate with you.");
+      } else {
+        toast("Response recorded. You'll be missed!", {
+          description: "Thank you for letting us know.",
+        });
+      }
+    } catch (e) {
+      setSubmitting(false);
+      toast.error(
+        e instanceof Error ? e.message : "Failed to submit RSVP. Please try again.",
+      );
     }
   }
 

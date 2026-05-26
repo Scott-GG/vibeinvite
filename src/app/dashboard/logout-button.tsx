@@ -11,10 +11,14 @@ export function LogoutButton() {
   const supabase = createClient();
 
   async function handleLogout() {
-    await supabase.auth.signOut();
-    toast.success("Signed out");
-    router.push("/login");
-    router.refresh();
+    try {
+      await supabase.auth.signOut();
+      toast.success("Signed out");
+      router.push("/login");
+      router.refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to sign out");
+    }
   }
 
   return (

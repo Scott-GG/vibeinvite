@@ -43,9 +43,13 @@ export function GuestInviteList({
   const [sendingId, setSendingId] = useState<string | null>(null);
 
   async function copyLink(guest: GuestWithLink) {
-    await navigator.clipboard.writeText(guest.inviteUrl);
-    setCopiedId(guest.id);
-    setTimeout(() => setCopiedId(null), 2000);
+    try {
+      await navigator.clipboard.writeText(guest.inviteUrl);
+      setCopiedId(guest.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch {
+      toast.error("Failed to copy link");
+    }
   }
 
   async function handleSend(guest: GuestWithLink) {

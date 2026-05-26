@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -93,22 +93,21 @@ const themes = [
 
 export default function NewEventPage() {
   const router = useRouter();
-  const supabase = createClient();
 
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [tier, setTier] = useState<string>("free");
+  const supabase = useRef(createClient());
 
-  // Fetch user's subscription tier
   useEffect(() => {
-    supabase
+    supabase.current
       .from("profiles")
       .select("subscription_tier")
       .single()
       .then(({ data }) => {
         if (data) setTier(data.subscription_tier);
       });
-  }, [supabase]);
+  }, []);
 
   const isFree = tier === "free";
 
@@ -141,9 +140,9 @@ export default function NewEventPage() {
 
     const {
       data: { user },
-    } = await supabase.auth.getUser();
+    } = await supabase.current.auth.getUser();
 
-    const { data, error } = await supabase
+    const { data, error } = await supabase.current
       .from("events")
       .insert({
         user_id: user!.id,

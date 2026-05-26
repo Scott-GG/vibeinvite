@@ -87,10 +87,14 @@ export function AiCopywriter({
   }
 
   async function copyVariant(text: string, idx: number) {
-    await navigator.clipboard.writeText(text);
-    setCopiedIdx(idx);
-    setTimeout(() => setCopiedIdx(null), 2000);
-    toast.success("Copied to clipboard");
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedIdx(idx);
+      setTimeout(() => setCopiedIdx(null), 2000);
+      toast.success("Copied to clipboard");
+    } catch {
+      toast.error("Failed to copy to clipboard");
+    }
   }
 
   async function applyToInvitation(text: string, idx: number) {
