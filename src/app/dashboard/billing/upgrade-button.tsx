@@ -1,43 +1,54 @@
 "use client";
 
-import { CreemCheckout } from "@creem_io/nextjs";
-
-const PRO_PRODUCT_ID = process.env.NEXT_PUBLIC_CREEM_PRO_PRODUCT_ID!;
-const UNLIMITED_PRODUCT_ID = process.env.NEXT_PUBLIC_CREEM_UNLIMITED_PRODUCT_ID!;
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export function UpgradeButton({
   type,
   label,
   eventId,
-  userId,
-  userEmail,
 }: {
   type: "pro_event" | "subscription";
   label: string;
   eventId?: string;
-  userId: string;
+  userId?: string;
   userEmail?: string;
 }) {
-  const isPro = type === "pro_event";
-  const metadata: Record<string, unknown> = { type };
-  if (eventId) metadata.eventId = eventId;
+  const [loading, setLoading] = useState(false);
+
+  async function handleUpgrade() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/creem/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, eventId }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.error(data.error ?? "Failed to create checkout");
+        console.error("[upgrade]", data);
+      }
+    } catch {
+      toast.error("Network error");
+    }
+    setLoading(false);
+  }
 
   return (
-    <CreemCheckout
-      productId={isPro ? PRO_PRODUCT_ID : UNLIMITED_PRODUCT_ID}
-      referenceId={userId}
-      customer={userEmail ? { email: userEmail } : undefined}
-      metadata={metadata}
-      successUrl={
-        isPro
-          ? `/dashboard/events/${eventId}?upgrade=success`
-          : `/dashboard/billing?subscribe=success`
-      }
-      checkoutPath="/api/creem/checkout"
+    <button
+      type="button"
+      onClick={handleUpgrade}
+      disabled={loading}
+      className="inline-flex w-full items-center justify-center rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50"
     >
-      <button className="inline-flex w-full items-center justify-center rounded-lg bg-stone-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stone-800 disabled:cursor-not-allowed disabled:opacity-50">
-        {label}
-      </button>
-    </CreemCheckout>
+      {loading ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : null}
+      {loading ? "Redirecting..." : label}
+    </button>
   );
 }

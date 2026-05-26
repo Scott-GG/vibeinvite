@@ -81,8 +81,6 @@ export default async function BillingPage() {
                 <UpgradeButton
                   type="subscription"
                   label="Upgrade to Unlimited"
-                  userId={user.id}
-                  userEmail={user.email ?? undefined}
                 />
               </div>
             )}

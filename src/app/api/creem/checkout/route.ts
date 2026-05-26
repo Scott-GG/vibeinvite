@@ -1,6 +1,67 @@
-import { Checkout } from "@creem_io/nextjs";
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
-export const GET = Checkout({
-  apiKey: process.env.CREEM_API_KEY!,
-  testMode: process.env.CREEM_ENVIRONMENT !== "production",
-});
+const CREEM_API = "https://test-api.creem.io/v1/checkouts";
+
+function getHost() {
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { type, eventId } = body as {
+      type: "pro_event" | "subscription";
+      eventId?: string;
+    };
+
+    const host = getHost();
+    const isPro = type === "pro_event";
+
+    const checkoutBody: Record<string, unknown> = {
+      product_id: isPro
+        ? process.env.NEXT_PUBLIC_CREEM_PRO_PRODUCT_ID!
+        : process.env.NEXT_PUBLIC_CREEM_UNLIMITED_PRODUCT_ID!,
+      units: 1,
+      referenceId: user.id,
+      customer: { email: user.email },
+      metadata: { type, ...(eventId ? { eventId } : {}) },
+      success_url: isPro
+        ? `${host}/dashboard/events/${eventId}?upgrade=success`
+        : `${host}/dashboard/billing?subscribe=success`,
+    };
+
+    const res = await fetch(CREEM_API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.CREEM_API_KEY!,
+      },
+      body: JSON.stringify(checkoutBody),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error("[creem checkout] API error:", JSON.stringify(data));
+      return NextResponse.json(
+        { error: "Failed to create checkout", details: JSON.stringify(data) },
+        { status: res.status },
+      );
+    }
+
+    return NextResponse.json({ url: data.checkout_url });
+  } catch (error) {
+    console.error("[creem checkout] Error:", error);
+    return NextResponse.json(
+      { error: "Failed to create checkout" },
+      { status: 500 },
+    );
+  }
+}

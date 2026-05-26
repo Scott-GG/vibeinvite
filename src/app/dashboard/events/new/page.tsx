@@ -71,17 +71,9 @@ export default function NewEventPage() {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [tier, setTier] = useState<string>("free");
-  const [userId, setUserId] = useState<string>("");
-  const [userEmail, setUserEmail] = useState<string>("");
 
-  // Fetch user's subscription tier and identity
+  // Fetch user's subscription tier
   useState(() => {
-    supabase.auth.getUser().then(({ data: authData }) => {
-      if (authData.user) {
-        setUserId(authData.user.id);
-        setUserEmail(authData.user.email ?? "");
-      }
-    });
     supabase
       .from("profiles")
       .select("subscription_tier")
@@ -313,8 +305,6 @@ export default function NewEventPage() {
                   <UpgradeButton
                     type="subscription"
                     label="Upgrade"
-                    userId={userId}
-                    userEmail={userEmail}
                   />
                 </div>
               )}
