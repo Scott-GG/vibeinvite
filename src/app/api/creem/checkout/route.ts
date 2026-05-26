@@ -3,10 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 
 const CREEM_API = "https://test-api.creem.io/v1/checkouts";
 
-function getHost() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
-}
-
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -21,13 +17,23 @@ export async function POST(request: NextRequest) {
       eventId?: string;
     };
 
-    const host = getHost();
     const isPro = type === "pro_event";
+    const productId = isPro
+      ? process.env.CREEM_PRO_PRODUCT_ID
+      : process.env.CREEM_UNLIMITED_PRODUCT_ID;
+
+    if (!productId) {
+      console.error("[creem checkout] Missing product ID for type:", type);
+      return NextResponse.json(
+        { error: "Server configuration error — missing product ID" },
+        { status: 500 },
+      );
+    }
+
+    const host = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
 
     const checkoutBody: Record<string, unknown> = {
-      product_id: isPro
-        ? process.env.NEXT_PUBLIC_CREEM_PRO_PRODUCT_ID!
-        : process.env.NEXT_PUBLIC_CREEM_UNLIMITED_PRODUCT_ID!,
+      product_id: productId,
       units: 1,
       referenceId: user.id,
       customer: { email: user.email },
