@@ -8,7 +8,7 @@ export const POST = Webhook({
   onCheckoutCompleted: async ({ product, customer, metadata, order }) => {
     const supabase = createAdminClient();
     const userId = (metadata as Record<string, unknown> | undefined)
-      ?.referenceId as string | undefined;
+      ?.userId as string | undefined;
     const eventId = (metadata as Record<string, unknown> | undefined)
       ?.eventId as string | undefined;
     const purchaseType = (metadata as Record<string, unknown> | undefined)
@@ -57,7 +57,7 @@ export const POST = Webhook({
   onGrantAccess: async ({ reason, product, customer, metadata }) => {
     const supabase = createAdminClient();
     const userId = (metadata as Record<string, unknown> | undefined)
-      ?.referenceId as string | undefined;
+      ?.userId as string | undefined;
 
     if (!userId) return;
 
@@ -82,7 +82,7 @@ export const POST = Webhook({
   onRevokeAccess: async ({ reason, customer, metadata }) => {
     const supabase = createAdminClient();
     const userId = (metadata as Record<string, unknown> | undefined)
-      ?.referenceId as string | undefined;
+      ?.userId as string | undefined;
 
     if (!userId) return;
 
@@ -100,7 +100,7 @@ export const POST = Webhook({
   onSubscriptionCanceled: async ({ customer, metadata }) => {
     const supabase = createAdminClient();
     const userId = (metadata as Record<string, unknown> | undefined)
-      ?.referenceId as string | undefined;
+      ?.userId as string | undefined;
 
     if (!userId) return;
 

@@ -27,9 +27,8 @@ export async function POST(request: NextRequest) {
     const checkoutBody: Record<string, unknown> = {
       product_id: productId,
       units: 1,
-      referenceId: user.id,
       customer: { email: user.email },
-      metadata: { type, ...(eventId ? { eventId } : {}) },
+      metadata: { type, userId: user.id, ...(eventId ? { eventId } : {}) },
       success_url: isPro
         ? `${host}/dashboard/events/${eventId}?upgrade=success`
         : `${host}/dashboard/billing?subscribe=success`,
