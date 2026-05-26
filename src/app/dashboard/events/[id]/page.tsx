@@ -38,7 +38,7 @@ export default async function EventDetailPage({
     .from("profiles")
     .select("subscription_tier")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   const isFree = (profile?.subscription_tier ?? "free") === "free" && !event.is_pro;
 

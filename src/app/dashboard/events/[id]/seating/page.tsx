@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { createClient, requireUser } from "@/lib/supabase/server";
 import { SeatingCanvas } from "@/components/seating/SeatingCanvas";
+import { UpgradeButton } from "@/app/dashboard/billing/upgrade-button";
 
 export default async function SeatingPage({
   params,
@@ -22,15 +22,48 @@ export default async function SeatingPage({
     .eq("user_id", user.id)
     .single();
 
-  // Gate: free users cannot access seating
   const { data: profile } = await supabase
     .from("profiles")
     .select("subscription_tier")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   const isFree = (profile?.subscription_tier ?? "free") === "free" && !event?.is_pro;
-  if (isFree) redirect("/dashboard/billing");
+
+  if (isFree) {
+    return (
+      <div className="p-6 lg:p-8">
+        <Link
+          href={`/dashboard/events/${id}`}
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "sm" }),
+            "mb-2",
+          )}
+        >
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Back
+        </Link>
+        <div className="mt-16 flex flex-col items-center justify-center text-center">
+          <h2 className="text-xl font-semibold text-stone-700">Seating Chart</h2>
+          <p className="mt-2 max-w-md text-muted-foreground">
+            Drag-and-drop seating arrangement is a Pro feature. Upgrade to unlock
+            seating charts for your events.
+          </p>
+          <div className="mt-6 flex items-center gap-3">
+            <UpgradeButton
+              type="pro_event"
+              eventId={id}
+              label="Unlock Pro — $29"
+            />
+            <UpgradeButton
+              type="subscription"
+              label="Go Unlimited — $9.99/mo"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const { data: tables } = await supabase
     .from("tables")

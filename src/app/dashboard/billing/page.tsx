@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
-import { CreditCard, Check, ArrowUpRight } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
+import { CreditCard, ArrowUpRight } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -9,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { createClient, requireUser } from "@/lib/supabase/server";
 import { UpgradeButton } from "./upgrade-button";
 import { CreemPortalButton } from "./creem-portal-button";
@@ -18,13 +16,11 @@ export default async function BillingPage() {
   const supabase = await createClient();
   const user = await requireUser();
 
-  if (!user) redirect("/login");
-
   const { data: profile } = await supabase
     .from("profiles")
     .select("subscription_tier, creem_customer_id")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   const { data: purchases } = await supabase
     .from("purchases")

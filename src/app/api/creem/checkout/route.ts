@@ -6,11 +6,12 @@ const CREEM_API = "https://test-api.creem.io/v1/checkouts";
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = session.user;
     const body = await request.json();
     const { type, eventId } = body as {
       type: "pro_event" | "subscription";
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
       ? (process.env.CREEM_PRO_PRODUCT_ID ?? "prod_3mzm4qaKsRTTbYnjvuAdRa")
       : (process.env.CREEM_UNLIMITED_PRODUCT_ID ?? "prod_7gSREGYaZLeLv1G15Ixv5A");
 
-    const host = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3001";
+    const host = process.env.NEXT_PUBLIC_SITE_URL ?? request.nextUrl.origin;
 
     const checkoutBody: Record<string, unknown> = {
       product_id: productId,
