@@ -154,12 +154,6 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t py-8 text-center text-xs text-stone-400">
-        <span className="font-medium text-stone-500">VibeInvite</span>
-        &nbsp;&mdash; Premium Digital Invitations. Crafted for moments that
-        matter.
-      </footer>
     </div>
   );
 }
