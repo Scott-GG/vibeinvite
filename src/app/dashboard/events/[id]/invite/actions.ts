@@ -106,8 +106,8 @@ export async function sendToAll(
       }),
     ]);
     results.push(result[0]);
-    // 150ms delay between sends to stay under Resend's 10/s limit
-    await new Promise((r) => setTimeout(r, 150));
+    // 800ms delay between sends — Resend free tier limits to ~1-2/s
+    await new Promise((r) => setTimeout(r, 800));
   }
 
   const succeeded = results.filter((r) => r.status === "fulfilled").length;

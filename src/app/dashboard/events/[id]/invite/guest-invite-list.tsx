@@ -41,6 +41,7 @@ export function GuestInviteList({
 }) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [sendingId, setSendingId] = useState<string | null>(null);
+  const [cooldownId, setCooldownId] = useState<string | null>(null);
 
   async function copyLink(guest: GuestWithLink) {
     try {
@@ -61,6 +62,9 @@ export function GuestInviteList({
     try {
       await sendToGuest(eventId, guest.id, undefined, theme);
       toast.success(`Invitation sent to ${guest.first_name}`);
+      // 8s cooldown to respect Resend rate limit
+      setCooldownId(guest.id);
+      setTimeout(() => setCooldownId(null), 8000);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to send");
     }
@@ -112,7 +116,7 @@ export function GuestInviteList({
                 variant="ghost"
                 size="xs"
                 onClick={() => handleSend(guest)}
-                disabled={sendingId === guest.id}
+                disabled={sendingId === guest.id || cooldownId === guest.id}
               >
                 {sendingId === guest.id ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
