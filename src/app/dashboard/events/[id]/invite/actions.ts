@@ -72,9 +72,10 @@ export async function sendToAll(
 
   const { data: guests } = await supabase
     .from("guests")
-    .select("id, first_name, last_name, email, access_token")
+    .select("id, first_name, last_name, email, access_token, status")
     .eq("event_id", eventId)
-    .not("email", "is", null);
+    .not("email", "is", null)
+    .neq("status", "sent");
 
   if (!guests || guests.length === 0) {
     throw new Error("No guests with email addresses to send to");
@@ -91,10 +92,11 @@ export async function sendToAll(
   });
 
   // Send sequentially with a small delay to respect Resend rate limits
-  const results: PromiseSettledResult<unknown>[] = [];
+  let succeeded = 0;
+  let failed = 0;
   for (const guest of guests) {
-    const result = await Promise.allSettled([
-      sendInvitationEmail({
+    try {
+      await sendInvitationEmail({
         to: guest.email!,
         guestName: guest.first_name,
         eventTitle: event.title,
@@ -103,16 +105,51 @@ export async function sendToAll(
         inviteUrl: `${baseUrl}/invitation/${guest.access_token}`,
         hostName,
         theme,
-      }),
-    ]);
-    results.push(result[0]);
+      });
+
+      // Mark as sent
+      await supabase
+        .from("guests")
+        .update({ status: "sent", updated_at: new Date().toISOString() })
+        .eq("id", guest.id);
+
+      succeeded++;
+    } catch {
+      failed++;
+    }
     // 800ms delay between sends — Resend free tier limits to ~1-2/s
     await new Promise((r) => setTimeout(r, 800));
   }
 
-  const succeeded = results.filter((r) => r.status === "fulfilled").length;
-  const failed = results.filter((r) => r.status === "rejected").length;
-
   revalidatePath(`/dashboard/events/${eventId}/invite`);
   return { succeeded, failed };
+}
+
+export async function scheduleSend(eventId: string, scheduledAt: string) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("events")
+    .update({ scheduled_send_at: scheduledAt })
+    .eq("id", eventId)
+    .select("scheduled_send_at")
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/dashboard/events/${eventId}/invite`);
+  return { scheduledAt: data.scheduled_send_at };
+}
+
+export async function cancelScheduledSend(eventId: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("events")
+    .update({ scheduled_send_at: null })
+    .eq("id", eventId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath(`/dashboard/events/${eventId}/invite`);
 }

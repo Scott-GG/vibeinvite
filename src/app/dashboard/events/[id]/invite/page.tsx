@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { createClient, requireUser } from "@/lib/supabase/server";
 import { GuestInviteList } from "./guest-invite-list";
 import { SendAllButton } from "./send-all-button";
+import { SendScheduler } from "./send-scheduler";
 
 export default async function InvitePage({
   params,
@@ -25,7 +26,7 @@ export default async function InvitePage({
 
   const { data: event } = await supabase
     .from("events")
-    .select("title, event_date, location_name, config")
+    .select("title, event_date, location_name, config, scheduled_send_at")
     .eq("id", id)
     .eq("user_id", user.id)
     .single();
@@ -126,6 +127,13 @@ export default async function InvitePage({
                   guestCount={guestsWithLinks.length}
                 />
               )}
+
+              <SendScheduler
+                eventId={id}
+                scheduledAt={event?.scheduled_send_at ?? null}
+              />
+
+              <div className="my-4 border-t" />
 
               <p className="text-xs text-muted-foreground">
                 You can also copy individual invitation links and share them

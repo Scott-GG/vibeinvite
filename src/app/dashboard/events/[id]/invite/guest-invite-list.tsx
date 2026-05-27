@@ -22,12 +22,14 @@ const statusColors: Record<string, "default" | "secondary" | "destructive" | "ou
   accepted: "default",
   declined: "destructive",
   pending: "outline",
+  sent: "secondary",
 };
 
 const statusLabels: Record<string, string> = {
   accepted: "Attending",
   declined: "Declined",
   pending: "Awaiting Response",
+  sent: "Invitation Sent",
 };
 
 export function GuestInviteList({
@@ -116,7 +118,11 @@ export function GuestInviteList({
                 variant="ghost"
                 size="xs"
                 onClick={() => handleSend(guest)}
-                disabled={sendingId === guest.id || cooldownId === guest.id}
+                disabled={
+                  sendingId === guest.id ||
+                  cooldownId === guest.id ||
+                  guest.status === "sent"
+                }
               >
                 {sendingId === guest.id ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
