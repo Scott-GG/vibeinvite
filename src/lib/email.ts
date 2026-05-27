@@ -185,6 +185,11 @@ export async function sendInvitationEmail({
         `Email domain not verified. Verify your domain in Resend: https://resend.com/domains (${msg})`,
       );
     }
+    if (msg.includes("rate_limit")) {
+      throw new Error(
+        `Sending too fast — please wait a moment between emails. (${msg})`,
+      );
+    }
     throw new Error(msg);
   }
   return data;

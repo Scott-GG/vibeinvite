@@ -90,8 +90,10 @@ export async function sendToAll(
     day: "numeric",
   });
 
-  const results = await Promise.allSettled(
-    guests.map((guest) =>
+  // Send sequentially with a small delay to respect Resend rate limits
+  const results: PromiseSettledResult<unknown>[] = [];
+  for (const guest of guests) {
+    const result = await Promise.allSettled([
       sendInvitationEmail({
         to: guest.email!,
         guestName: guest.first_name,
@@ -102,8 +104,11 @@ export async function sendToAll(
         hostName,
         theme,
       }),
-    ),
-  );
+    ]);
+    results.push(result[0]);
+    // 150ms delay between sends to stay under Resend's 10/s limit
+    await new Promise((r) => setTimeout(r, 150));
+  }
 
   const succeeded = results.filter((r) => r.status === "fulfilled").length;
   const failed = results.filter((r) => r.status === "rejected").length;
