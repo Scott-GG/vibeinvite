@@ -14,10 +14,72 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://vibeinvite.bzwl.club";
+
 export const metadata: Metadata = {
-  title: "VibeInvite — Premium Digital Invitations",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "VibeInvite — Premium Digital Invitations",
+    template: "%s — VibeInvite",
+  },
   description:
-    "Create stunning, paper-like digital invitations with effortless RSVP management for weddings, galas, and milestone celebrations.",
+    "Create stunning, paper-like digital invitations with wax-sealed envelope animations, AI-crafted copy, and effortless RSVP tracking. Perfect for weddings, galas, and milestone celebrations.",
+  keywords: [
+    "digital invitations",
+    "online invitations",
+    "wedding invitations",
+    "premium invitations",
+    "RSVP management",
+    "digital invite",
+    "event invitations",
+    "paperless invitations",
+    "invitation maker",
+    "AI invitation writer",
+  ],
+  authors: [{ name: "VibeInvite" }],
+  creator: "VibeInvite",
+  publisher: "VibeInvite",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "VibeInvite",
+    title: "VibeInvite — Premium Digital Invitations",
+    description:
+      "Create stunning, paper-like digital invitations with wax-sealed envelope animations. The invitation is the first moment your guests will remember.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "VibeInvite — Premium Digital Invitations",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VibeInvite — Premium Digital Invitations",
+    description:
+      "Create stunning, paper-like digital invitations with wax-sealed envelope animations.",
+    images: ["/og-image.png"],
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 const footerLinks = [

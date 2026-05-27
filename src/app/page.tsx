@@ -1,7 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Sparkles, Users, Mail, ChevronDown, ChevronUp } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "VibeInvite — Premium Digital Invitations | Wax-Sealed Envelopes",
+  description:
+    "Create stunning, paper-like digital invitations with wax-sealed envelope animations and effortless RSVP tracking. 6 designer themes, AI copywriting. Start free.",
+  openGraph: {
+    title: "VibeInvite — The Invitation Your Guests Will Remember",
+    description:
+      "Create stunning, paper-like digital invitations with wax-sealed envelope animations. 6 designer themes, AI copywriting, effortless RSVPs.",
+  },
+};
 
 const scenarios = [
   {
@@ -106,8 +118,53 @@ const faqs = [
 ];
 
 export default function LandingPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "VibeInvite",
+        url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://vibeinvite.bzwl.club",
+        description:
+          "Premium digital invitation platform with wax-sealed envelope animations, AI copywriting, and effortless RSVP tracking.",
+        logo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://vibeinvite.bzwl.club"}/og-image.png`,
+        sameAs: [],
+      },
+      {
+        "@type": "WebSite",
+        name: "VibeInvite",
+        url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://vibeinvite.bzwl.club",
+        description:
+          "Create stunning, paper-like digital invitations for weddings, galas, and milestone celebrations.",
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://vibeinvite.bzwl.club"}/?s={search_term_string}`,
+          },
+          "query-input": "required name=search_term_string",
+        },
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: faq.answer,
+          },
+        })),
+      },
+    ],
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Nav */}
       <header className="sticky top-0 z-50 flex items-center justify-between border-b bg-white/80 px-6 py-4 backdrop-blur">
         <span className="text-lg font-semibold tracking-tight text-stone-900">

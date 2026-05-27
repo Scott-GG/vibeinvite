@@ -1,7 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Pricing — Simple, Transparent Pricing | VibeInvite",
+  description:
+    "Start free with 15 guests. Upgrade to Signature ($29/event) for unlimited guests and all 6 premium themes, or Host ($9.99/mo) for unlimited events.",
+  openGraph: {
+    title: "VibeInvite Pricing — Start Free, Upgrade When You Need More",
+    description:
+      "Starter: free forever. Signature: $29/event. Host: $9.99/month. All plans include wax-sealed envelope animations and effortless RSVP tracking.",
+  },
+};
 
 const plans = [
   {
