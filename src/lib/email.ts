@@ -4,6 +4,15 @@ import { getTheme, type ThemeConfig } from "./themes";
 const FROM_ADDRESS =
   process.env.RESEND_FROM_ADDRESS ?? "VibeInvite <onboarding@resend.dev>";
 
+function initials(name: string): string {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
 export function invitationEmailHtml({
   guestName,
   eventTitle,
@@ -23,108 +32,211 @@ export function invitationEmailHtml({
 }) {
   const t: ThemeConfig = getTheme(theme);
   const isDark = theme === "midnight" || theme === "modern";
-  const bgColor = isDark ? "#1a1a1a" : t.envelopeBg;
-  const textureColor = t.envelopeTexture.replace("#", "");
-  const textColor = isDark ? "#f0e8d8" : "#3a2a1a";
-  const subColor = isDark ? "#b0a090" : "#8c7868";
-  const mutedColor = isDark ? "#999" : "#a09080";
-  const accentHex = t.accentColor;
-  const accentDark = t.accentHover;
-  const btnTextColor = isDark ? "#1a1a1a" : "#ffffff";
-  const borderColor = isDark ? "#333" : "#e0d5c5";
-  const greetingColor = isDark ? "#ccc" : "#5c4c3c";
-  const bodyColor = isDark ? "#aaa" : "#6c5c4c";
-  const sigColor = isDark ? "#777" : "#b0a090";
-  const footerColor = isDark ? "#555" : "#c0b0a0";
+  const bg = isDark ? "#1a1a1a" : t.envelopeBg;
+  const tex = t.envelopeTexture.replace("#", "");
+  const heading = isDark ? "#f0e8d8" : "#2c1f14";
+  const subtitle = isDark ? "#b0a090" : "#6b5744";
+  const body = isDark ? "#c0b0a0" : "#5c4c3c";
+  const muted = isDark ? "#777" : "#a09080";
+  const accent = t.accentColor;
+  const accentDk = t.accentHover;
+  const btnText = isDark ? "#1a1a1a" : "#ffffff";
+  const cardBg = isDark ? "#242424" : "#ffffff";
+  const cardBorder = isDark ? "#333" : "#e0d5c5";
+  const line = isDark ? "#3a3530" : "#e0d5c5";
+
+  const eventInitial = initials(eventTitle);
+  const sealGradient = t.sealOuter;
+  const firstName = guestName.split(" ")[0];
 
   return `<!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
 </head>
-<body style="margin:0;padding:0;font-family:Georgia,'Times New Roman',serif;background-color:${bgColor};background-image:url('data:image/svg+xml,%3Csvg width=\\"20\\" height=\\"20\\" xmlns=\\"http://www.w3.org/2000/svg\\"%3E%3Ccircle cx=\\"10\\" cy=\\"10\\" r=\\"0.6\\" fill=\\"%23${textureColor}22\\"/%3E%3C/svg%3E');">
-  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;">
-    <tr>
-      <td style="padding:48px 24px 32px;text-align:center;">
-        <!-- Envelope icon -->
-        <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px;">
-          <tr>
-            <td style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg, ${accentHex}, ${accentDark});text-align:center;box-shadow:0 8px 24px rgba(139,105,20,0.25);">
-              <span style="font-size:24px;line-height:56px;">&#9993;</span>
-            </td>
-          </tr>
-        </table>
+<body style="margin:0;padding:0;font-family:Georgia,'Times New Roman',serif;background-color:${bg};background-image:url('data:image/svg+xml,%3Csvg width=%2240%22 height=%2240%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ccircle cx=%2220%22 cy=%2220%22 r=%220.5%22 fill=%22%23${tex}33%22/%3E%3C/svg%3E');">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;margin:0 auto;">
 
-        <!-- Host line -->
-        <p style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:${mutedColor};margin:0 0 24px;">
-          ${hostName ? `${hostName} invites you to` : "You are cordially invited to"}
-        </p>
+  <!-- Top spacing -->
+  <tr><td style="height:40px;"></td></tr>
 
-        <!-- Title -->
-        <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:32px;color:${textColor};margin:0 0 8px;font-weight:normal;line-height:1.3;">
-          ${eventTitle}
-        </h1>
+  <!-- ── Outer wrapper: envelope liner texture ── -->
+  <tr>
+    <td style="padding:0 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="border-radius:4px;background:${cardBg};box-shadow:0 2px 24px rgba(0,0,0,0.08),0 0 0 1px ${cardBorder};">
 
-        <!-- Date & Location -->
-        <p style="font-family:Georgia,'Times New Roman',serif;font-size:16px;color:${subColor};margin:0 0 4px;">
-          ${eventDate}
-        </p>
-        ${eventLocation ? `<p style="font-family:Georgia,'Times New Roman',serif;font-size:14px;color:${isDark ? "#888" : "#b0a090"};margin:0 0 0;">${eventLocation}</p>` : ""}
+        <!-- ── Top ornament band ── -->
+        <tr>
+          <td style="padding:40px 32px 0;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+              <tr>
+                <td style="width:40px;height:1px;background:linear-gradient(90deg,transparent,${accent});"></td>
+                <td style="padding:0 12px;color:${accent};font-size:12px;">&#10086;</td>
+                <td style="width:40px;height:1px;background:linear-gradient(90deg,${accent},transparent);"></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
 
-        <!-- Divider -->
-        <table cellpadding="0" cellspacing="0" style="margin:32px auto;width:80px;">
-          <tr>
-            <td style="height:1px;background:linear-gradient(90deg, transparent, ${accentHex}, transparent);"></td>
-          </tr>
-          <tr>
-            <td style="text-align:center;padding:6px 0;">
-              <span style="color:${accentHex};font-size:8px;">&#9670;</span>
-            </td>
-          </tr>
-        </table>
+        <!-- ── Wax Seal / Crest ── -->
+        <tr>
+          <td style="padding:28px 32px 8px;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+              <tr>
+                <td style="width:72px;height:72px;border-radius:50%;background:${sealGradient};text-align:center;vertical-align:middle;box-shadow:0 6px 20px rgba(0,0,0,0.18),inset 0 1px 0 rgba(255,255,255,0.15);">
+                  <span style="font-family:Georgia,'Times New Roman',serif;font-size:22px;color:#faf8f3;letter-spacing:0.04em;font-weight:bold;">${eventInitial}</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
 
-        <!-- Greeting -->
-        <p style="font-family:Georgia,'Times New Roman',serif;font-size:17px;color:${greetingColor};margin:0 0 20px;line-height:1.7;">
-          Dear ${guestName},
-        </p>
-        <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:${bodyColor};margin:0 0 36px;line-height:1.8;">
-          ${hostName ? `${hostName} has the pleasure of inviting you to ${eventTitle}.` : `You are warmly invited to ${eventTitle}.`} Please open your personalized invitation to view the details and kindly respond at your earliest convenience.
-        </p>
+        <!-- ── Host line ── -->
+        <tr>
+          <td style="padding:16px 32px 0;text-align:center;">
+            <p style="font-family:Georgia,'Times New Roman',serif;font-size:12px;letter-spacing:0.28em;text-transform:uppercase;color:${muted};margin:0;">
+              ${hostName ? `${hostName} requests the pleasure of your company at` : "The honour of your presence is requested at"}
+            </p>
+          </td>
+        </tr>
 
-        <!-- CTA Button -->
-        <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
-          <tr>
-            <td style="border-radius:10px;background:linear-gradient(135deg, ${accentHex}, ${accentDark});box-shadow:0 4px 14px rgba(139,105,20,0.35);">
-              <a href="${inviteUrl}" style="display:inline-block;padding:16px 48px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:600;color:${btnTextColor};text-decoration:none;letter-spacing:0.02em;white-space:nowrap;">
-                Open Your Invitation &rarr;
-              </a>
-            </td>
-          </tr>
-        </table>
+        <!-- ── Event Title ── -->
+        <tr>
+          <td style="padding:14px 32px 0;text-align:center;">
+            <h1 style="font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:normal;color:${heading};margin:0;line-height:1.25;letter-spacing:0.01em;">
+              ${eventTitle}
+            </h1>
+          </td>
+        </tr>
 
-        <!-- Fallback link -->
-        <p style="font-family:Arial,sans-serif;font-size:12px;color:${isDark ? "#666" : "#b0a090"};margin:28px 0 0;line-height:1.6;">
-          If the button doesn&rsquo;t work, copy this link into your browser:<br>
-          <a href="${inviteUrl}" style="color:${accentHex};text-decoration:underline;">${inviteUrl}</a>
-        </p>
+        <!-- ── Date + Location in a bordered card ── -->
+        <tr>
+          <td style="padding:24px 32px 0;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid ${line};border-left:none;border-right:none;">
+              <tr>
+                <td style="padding:16px 0;text-align:center;">
+                  <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:${isDark ? "#e0d5c0" : "#5c4c3c"};margin:0 0 4px;line-height:1.5;">
+                    <span style="display:inline-block;vertical-align:middle;margin-right:6px;color:${accent};font-size:11px;">&#9728;</span>
+                    ${eventDate}
+                  </p>
+                  ${
+                    eventLocation
+                      ? `<p style="font-family:Georgia,'Times New Roman',serif;font-size:13px;color:${muted};margin:0;line-height:1.5;">
+                    <span style="display:inline-block;vertical-align:middle;margin-right:6px;color:${accent};font-size:10px;">&#9906;</span>
+                    ${eventLocation}
+                  </p>`
+                      : ""
+                  }
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
 
-        <!-- Signature -->
-        <table cellpadding="0" cellspacing="0" style="margin:40px auto 0;text-align:center;">
-          <tr>
-            <td style="padding-top:24px;border-top:1px solid ${borderColor};">
-              <p style="font-family:Georgia,'Times New Roman',serif;font-size:13px;color:${sigColor};margin:0;">
-                With love &amp; anticipation
-              </p>
-              <p style="font-family:Georgia,'Times New Roman',serif;font-size:12px;color:${footerColor};margin:8px 0 0;">
-                Sent via <strong style="color:${isDark ? "#999" : "#8c7868"};">VibeInvite</strong> &mdash; Premium Digital Invitations
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
+        <!-- ── Ornamental divider ── -->
+        <tr>
+          <td style="padding:28px 32px;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+              <tr>
+                <td style="width:60px;height:1px;background:linear-gradient(90deg,transparent,${accent}66);"></td>
+                <td style="padding:0 10px;color:${accent};font-size:10px;">&#10087;</td>
+                <td style="width:60px;height:1px;background:linear-gradient(90deg,${accent}66,transparent);"></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ── Personal address ── -->
+        <tr>
+          <td style="padding:0 32px;">
+            <p style="font-family:Georgia,'Times New Roman',serif;font-size:16px;color:${body};margin:0;line-height:1.8;">
+              Dear <span style="color:${heading};font-weight:600;">${firstName}</span>,
+            </p>
+          </td>
+        </tr>
+
+        <!-- ── Message body ── -->
+        <tr>
+          <td style="padding:12px 32px 0;">
+            <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:${body};margin:0;line-height:1.85;">
+              ${
+                hostName
+                  ? `${hostName} has the distinct pleasure of inviting you to <strong style="color:${heading};font-weight:600;">${eventTitle}</strong>. Your presence would make this occasion all the more memorable, and we do hope you will be able to join us for what promises to be an unforgettable celebration.`
+                  : `You are warmly invited to <strong style="color:${heading};font-weight:600;">${eventTitle}</strong>. We would be honoured by your presence and hope you can join us for this special occasion.`
+              }
+            </p>
+            <p style="font-family:Georgia,'Times New Roman',serif;font-size:15px;color:${body};margin:16px 0 0;line-height:1.85;">
+              Please open your personal invitation below to find the full details and kindly respond at your earliest convenience.
+            </p>
+          </td>
+        </tr>
+
+        <!-- ── CTA Button ── -->
+        <tr>
+          <td style="padding:32px 32px 0;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+              <tr>
+                <td style="border-radius:6px;background:linear-gradient(160deg,${accent},${accentDk});box-shadow:0 6px 18px ${accent}44,0 2px 4px rgba(0,0,0,0.12);">
+                  <a href="${inviteUrl}" style="display:inline-block;padding:18px 52px;font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:600;color:${btnText};text-decoration:none;letter-spacing:0.03em;white-space:nowrap;line-height:1;">
+                    Open Your Invitation
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- ── Gentle hint ── -->
+        <tr>
+          <td style="padding:20px 32px 0;text-align:center;">
+            <p style="font-family:Georgia,'Times New Roman',serif;font-size:13px;color:${muted};margin:0;font-style:italic;line-height:1.6;">
+               The enclosed invitation has been prepared especially for you.
+            </p>
+          </td>
+        </tr>
+
+        <!-- ── Fallback link ── -->
+        <tr>
+          <td style="padding:8px 32px 0;text-align:center;">
+            <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:${isDark ? "#555" : "#c0b0a0"};margin:0;line-height:1.6;">
+              If the button does not appear, copy this link:<br>
+              <a href="${inviteUrl}" style="color:${accent};text-decoration:underline;word-break:break-all;">${inviteUrl}</a>
+            </p>
+          </td>
+        </tr>
+
+        <!-- ── Bottom ornament ── -->
+        <tr>
+          <td style="padding:32px 32px 40px;text-align:center;">
+            <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
+              <tr>
+                <td style="width:50px;height:1px;background:linear-gradient(90deg,transparent,${accent}55);"></td>
+                <td style="padding:0 10px;color:${accent}88;font-size:8px;">&#9670;</td>
+                <td style="width:50px;height:1px;background:linear-gradient(90deg,${accent}55,transparent);"></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+
+  <!-- ── Footer ── -->
+  <tr>
+    <td style="padding:28px 32px 32px;text-align:center;">
+      <p style="font-family:Georgia,'Times New Roman',serif;font-size:13px;color:${isDark ? "#777" : "#b0a090"};margin:0;">
+        With anticipation &nbsp;&#10022;&nbsp; <strong style="color:${isDark ? "#999" : "#8c7868"};font-weight:600;">VibeInvite</strong>
+      </p>
+      <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:${isDark ? "#555" : "#c0b0a0"};margin:6px 0 0;line-height:1.6;">
+        Premium Digital Invitations &mdash; Crafted for moments that matter.
+      </p>
+    </td>
+  </tr>
+
+</table>
 </body>
 </html>`;
 }
@@ -168,8 +280,8 @@ export async function sendInvitationEmail({
     from: FROM_ADDRESS,
     to,
     subject: hostName
-      ? `An Invitation from ${hostName} Awaits — ${eventTitle}`
-      : `You are Invited to ${eventTitle}`,
+      ? `${hostName} requests the pleasure of your company — ${eventTitle}`
+      : `The honour of your presence is requested — ${eventTitle}`,
     html,
   });
 
