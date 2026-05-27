@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,20 +9,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Trash2, Mail, Phone } from "lucide-react";
+import { Trash2, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
-import { addGuest, deleteGuest } from "./actions";
+import { deleteGuest } from "./actions";
+import { GuestImporter } from "./guest-importer";
 
 type GuestRow = {
   id: string;
@@ -60,18 +50,6 @@ const statusLabels: Record<string, string> = {
 };
 
 export function GuestTable({ eventId, guests, canAddMore = true }: GuestTableProps) {
-  const [open, setOpen] = useState(false);
-
-  async function handleAdd(formData: FormData) {
-    try {
-      await addGuest(eventId, formData);
-      setOpen(false);
-      toast.success("Guest added");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to add guest");
-    }
-  }
-
   async function handleDelete(guestId: string) {
     try {
       await deleteGuest(eventId, guestId);
@@ -89,50 +67,7 @@ export function GuestTable({ eventId, guests, canAddMore = true }: GuestTablePro
         </p>
 
         {canAddMore ? (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger
-              render={
-                <Button size="sm">
-                  <Plus className="mr-1 h-4 w-4" />
-                  Add Guest
-                </Button>
-              }
-            />
-            <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add Guest</DialogTitle>
-            </DialogHeader>
-            <form action={handleAdd} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="first_name">First Name *</Label>
-                  <Input id="first_name" name="first_name" required />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="last_name">Last Name *</Label>
-                  <Input id="last_name" name="last_name" required />
-                </div>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="phone">Phone</Label>
-                <Input id="phone" name="phone" type="tel" />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox id="plus_one_allowed" name="plus_one_allowed" value="on" />
-                <Label htmlFor="plus_one_allowed" className="text-sm">
-                  Allow Plus One
-                </Label>
-              </div>
-              <Button type="submit" className="w-full">
-                Add Guest
-              </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+          <GuestImporter eventId={eventId} />
         ) : (
           <a
             href="/dashboard/billing"
