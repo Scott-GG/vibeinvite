@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { createClient, requireUser } from "@/lib/supabase/server";
 import { UpgradeButton } from "./upgrade-button";
-import { CreemPortalButton } from "./creem-portal-button";
+import { PayPalPortalButton } from "./paypal-portal-button";
 
 export default async function BillingPage() {
   const supabase = await createClient();
@@ -18,7 +18,7 @@ export default async function BillingPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_tier, creem_customer_id")
+    .select("subscription_tier, paypal_subscriber_id")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -78,9 +78,9 @@ export default async function BillingPage() {
                 />
               </div>
             )}
-            {tier === "unlimited" && profile?.creem_customer_id && (
+            {tier === "unlimited" && profile?.paypal_subscriber_id && (
               <div className="mt-6">
-                <CreemPortalButton customerId={profile.creem_customer_id} />
+                <PayPalPortalButton customerId={profile.paypal_subscriber_id} />
               </div>
             )}
           </CardContent>

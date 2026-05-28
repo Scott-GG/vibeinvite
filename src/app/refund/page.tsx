@@ -23,7 +23,7 @@ export default function RefundPage() {
             <p>
               We want you to be completely satisfied with VibeInvite. This policy explains our refund and cancellation
               terms for both one-time event purchases and recurring subscriptions. All payments are processed through
-              Creem (Armitage Labs O&Uuml;, Estonia), our Merchant of Record.
+              PayPal (Armitage Labs O&Uuml;, Estonia), our Merchant of Record.
             </p>
           </section>
 
@@ -53,7 +53,7 @@ export default function RefundPage() {
             </p>
             <ul className="list-disc space-y-1 pl-5">
               <li>From your <Link href="/dashboard/billing" className="text-amber-700 underline hover:text-amber-800">Billing dashboard</Link></li>
-              <li>Through the Creem customer portal (accessible from your Billing page)</li>
+              <li>Through the PayPal customer portal (accessible from your Billing page)</li>
               <li>By contacting us at{" "}
                 <a href="mailto:support@vibeinvite.bzwl.club" className="text-amber-700 underline hover:text-amber-800">
                   support@vibeinvite.bzwl.club
@@ -76,7 +76,7 @@ export default function RefundPage() {
                 support@vibeinvite.bzwl.club
               </a>{" "}
               with your account email and purchase details (event name or subscription date). We will respond within{" "}
-              <strong>3 business days</strong>. Approved refunds will be processed through Creem and typically appear
+              <strong>3 business days</strong>. Approved refunds will be processed through PayPal and typically appear
               on your original payment method within 5–10 business days, depending on your card issuer.
             </p>
           </section>
@@ -96,7 +96,7 @@ export default function RefundPage() {
             <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">6. Chargebacks</h2>
             <p>
               If you believe a charge is erroneous or unauthorized, please contact us first before initiating a
-              chargeback with your bank. We are committed to resolving billing issues promptly and fairly. Creem
+              chargeback with your bank. We are committed to resolving billing issues promptly and fairly. PayPal
               handles chargeback disputes on our behalf as the Merchant of Record.
             </p>
           </section>

@@ -37,10 +37,10 @@ export default function TermsPage() {
           <section>
             <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">3. Merchant of Record</h2>
             <p>
-              VibeInvite uses Creem (Armitage Labs O&Uuml;, Estonia) as its Merchant of Record. When you make a
-              purchase through our platform, Creem is the legal seller of record. Creem handles payment processing,
+              VibeInvite uses PayPal (Armitage Labs O&Uuml;, Estonia) as its Merchant of Record. When you make a
+              purchase through our platform, PayPal is the legal seller of record. PayPal handles payment processing,
               tax collection and remittance (including VAT, GST, and sales tax), invoicing, and chargeback management.
-              By making a purchase, you acknowledge that your payment is processed by Creem on our behalf.
+              By making a purchase, you acknowledge that your payment is processed by PayPal on our behalf.
             </p>
           </section>
 
@@ -60,7 +60,7 @@ export default function TermsPage() {
               authorize us to charge your payment method on a recurring basis until you cancel.
             </p>
             <p>
-              All prices are displayed in USD and are subject to applicable taxes collected by Creem. We reserve the
+              All prices are displayed in USD and are subject to applicable taxes collected by PayPal. We reserve the
               right to change pricing with reasonable notice. Price changes will not affect existing subscriptions
               until the next billing cycle.
             </p>
@@ -69,7 +69,7 @@ export default function TermsPage() {
           <section>
             <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">6. Cancellation</h2>
             <p>
-              You may cancel your subscription at any time from your Billing dashboard or via the Creem customer
+              You may cancel your subscription at any time from your Billing dashboard or via the PayPal customer
               portal. Cancellation takes effect at the end of your current billing period. You will retain access
               to paid features until that date. No refunds are issued for partial billing periods. See our{" "}
               <a href="/refund" className="text-amber-700 underline hover:text-amber-800">
@@ -124,7 +124,7 @@ export default function TermsPage() {
             <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">11. Third-Party Services</h2>
             <p>
               The Service integrates with third-party platforms including Supabase (data storage and authentication),
-              Resend (email delivery), Creem (payment processing), and OpenAI / Anthropic (AI copywriting). Your use
+              Resend (email delivery), PayPal (payment processing), and OpenAI / Anthropic (AI copywriting). Your use
               of these services is subject to their respective terms and privacy policies. We are not responsible for
               the availability or performance of third-party services.
             </p>

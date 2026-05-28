@@ -75,9 +75,9 @@ export default function ContactPage() {
             <div className="mt-6 rounded-lg bg-stone-50 p-4 text-xs text-stone-500">
               <p className="font-medium text-stone-700">Payment Processing</p>
               <p className="mt-1">
-                VibeInvite uses Creem (Armitage Labs O&Uuml;, Estonia) as our Merchant of Record. Creem handles
+                VibeInvite uses PayPal (Armitage Labs O&Uuml;, Estonia) as our Merchant of Record. PayPal handles
                 all payment processing, tax collection and remittance, invoicing, and chargeback management.
-                Your payment information is securely processed by Creem and is never stored on our servers.
+                Your payment information is securely processed by PayPal and is never stored on our servers.
               </p>
             </div>
           </div>

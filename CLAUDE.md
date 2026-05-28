@@ -11,7 +11,7 @@ High-end digital invitation platform for western social etiquette events (Weddin
 - **Frontend:** Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Framer Motion, shadcn/ui
 - **Backend/Database:** Supabase (PostgreSQL, Auth, Storage, Edge Functions)
 - **Email/SMS:** Resend (transactional email) + Twilio (SMS)
-- **Payments:** Creem (Merchant of Record — one-time + subscription via `@creem_io/nextjs` SDK)
+- **Payments:** PayPal (REST API — one-time + subscription via `@paypal/react-paypal-js`)
 - **AI:** OpenAI API / Anthropic Claude API (copywriting & layout generation)
 
 ## Commands
@@ -29,7 +29,7 @@ npm run lint     # Run ESLint
 [Frontend: Next.js + Framer Motion]
        | (Authed REST / Realtime Subscription)
        v
-[Backend: Supabase] --(Edge Functions)--> [Third-Party APIs: Resend/Creem/AI]
+[Backend: Supabase] --(Edge Functions)--> [Third-Party APIs: Resend/PayPal/AI]
        |
        v
 [PostgreSQL Database]

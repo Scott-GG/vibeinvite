@@ -113,7 +113,7 @@ const faqs = [
   },
   {
     question: "What payment methods do you accept?",
-    answer: "We process payments securely through Creem. All major credit and debit cards are accepted — Visa, Mastercard, American Express, and more.",
+    answer: "We process payments securely through PayPal. All major credit and debit cards are accepted — Visa, Mastercard, American Express, and more.",
   },
 ];
 

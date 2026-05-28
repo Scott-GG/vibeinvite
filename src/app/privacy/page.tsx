@@ -45,12 +45,12 @@ export default function PrivacyPage() {
 
             <h3 className="mb-2 mt-4 font-semibold text-stone-800">2.3 Payment Information</h3>
             <p>
-              Payment processing is handled by Creem (Armitage Labs O&Uuml;), our Merchant of Record. We do not
-              store or have access to your full credit card details. Creem collects billing information necessary to
+              Payment processing is handled by PayPal, our Merchant of Record. We do not
+              store or have access to your full credit card details. PayPal collects billing information necessary to
               process your payments. See{" "}
-              <a href="https://www.creem.io/privacy" className="text-amber-700 underline hover:text-amber-800"
+              <a href="https://www.paypal.com/privacy" className="text-amber-700 underline hover:text-amber-800"
                 target="_blank" rel="noopener noreferrer">
-                Creem&rsquo;s Privacy Policy
+                PayPal&rsquo;s Privacy Policy
               </a>{" "}
               for details on their data handling.
             </p>
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
             <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">3. How We Use Your Information</h2>
             <ul className="list-disc space-y-1 pl-5">
               <li>To provide, maintain, and improve the Service</li>
-              <li>To process payments and manage subscriptions through Creem</li>
+              <li>To process payments and manage subscriptions through PayPal</li>
               <li>To send invitation emails on your behalf through Resend</li>
               <li>To authenticate your account and secure your data</li>
               <li>To generate AI-assisted invitation copy at your request</li>
@@ -93,11 +93,11 @@ export default function PrivacyPage() {
                 </p>
               </div>
               <div className="rounded-lg border bg-white p-4">
-                <h3 className="font-semibold text-stone-800">Creem (Armitage Labs O&Uuml;)</h3>
+                <h3 className="font-semibold text-stone-800">PayPal</h3>
                 <p className="mt-1 text-xs text-stone-500">
-                  Merchant of Record for payment processing, tax collection, and invoicing. Creem is based in
+                  Merchant of Record for payment processing, tax collection, and invoicing. PayPal is based in
                   Estonia (EU) and complies with GDPR.{" "}
-                  <a href="https://www.creem.io/privacy" className="text-amber-700 underline hover:text-amber-800"
+                  <a href="https://www.paypal.com/privacy" className="text-amber-700 underline hover:text-amber-800"
                     target="_blank" rel="noopener noreferrer">Privacy Policy</a>
                 </p>
               </div>
@@ -124,7 +124,7 @@ export default function PrivacyPage() {
             <p>
               We retain your account data and event information for as long as your account is active. Guest data is
               retained as part of your event records. You may request deletion of your account and associated data by
-              contacting us. Payment records are retained by Creem in accordance with applicable tax and accounting
+              contacting us. Payment records are retained by PayPal in accordance with applicable tax and accounting
               laws (typically 7 years).
             </p>
           </section>
@@ -179,7 +179,7 @@ export default function PrivacyPage() {
             <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">10. International Data Transfers</h2>
             <p>
               Our service providers operate in multiple jurisdictions. Supabase servers may be located in various
-              regions worldwide. Creem is based in Estonia (EU) and processes data in compliance with GDPR. By using
+              regions worldwide. PayPal is based in Estonia (EU) and processes data in compliance with GDPR. By using
               the Service, you consent to the transfer of your data to servers outside your country of residence.
             </p>
           </section>
