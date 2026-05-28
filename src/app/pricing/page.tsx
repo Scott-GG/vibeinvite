@@ -109,7 +109,7 @@ export default function PricingPage() {
             <div
               key={plan.name}
               className={cn(
-                "relative flex flex-col rounded-2xl border bg-white p-8 shadow-sm transition-shadow hover:shadow-lg",
+                "relative flex flex-col rounded-2xl border bg-white p-8 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg",
                 plan.highlight &&
                   "border-amber-300 ring-2 ring-amber-100 shadow-xl",
               )}

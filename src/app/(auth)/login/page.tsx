@@ -100,7 +100,7 @@ export default function LoginPage() {
       <CardContent className="space-y-4">
         <Button
           variant="outline"
-          className="h-12 w-full border-stone-300 bg-white text-sm font-medium shadow-sm transition-shadow hover:shadow-md"
+          className="h-12 w-full border-stone-300 bg-white text-sm font-medium shadow-sm transition-all hover:shadow-md active:scale-[0.98]"
           onClick={handleGoogleSignIn}
         >
           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -147,7 +147,7 @@ export default function LoginPage() {
           </div>
           <Button
             type="submit"
-            className="h-12 w-full shadow-sm transition-shadow hover:shadow-md"
+            className="h-12 w-full shadow-sm transition-all hover:shadow-md active:scale-[0.98]"
             disabled={loading}
           >
             <LogIn className="mr-2 h-4 w-4" />

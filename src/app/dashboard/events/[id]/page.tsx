@@ -15,6 +15,7 @@ import { RealtimeStats } from "@/components/dashboard/RealtimeStats";
 import { DietaryChart } from "@/components/dashboard/DietaryChart";
 import { AiCopywriter } from "@/components/dashboard/AiCopywriter";
 import { UpgradeButton } from "@/app/dashboard/billing/upgrade-button";
+import { DeleteEventButton } from "./delete-button";
 
 export default async function EventDetailPage({
   params,
@@ -104,6 +105,7 @@ export default async function EventDetailPage({
               Seating
             </Link>
           )}
+          <DeleteEventButton eventId={id} />
         </div>
       </div>
 

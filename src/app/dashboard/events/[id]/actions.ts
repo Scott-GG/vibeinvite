@@ -1,7 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+
+export async function deleteEvent(eventId: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("events")
+    .delete()
+    .eq("id", eventId);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/dashboard");
+}
 
 export async function saveInvitationMessage(eventId: string, message: string) {
   const supabase = await createClient();

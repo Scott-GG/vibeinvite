@@ -97,7 +97,7 @@ export default async function GuestsPage({
           { label: "Declined", value: stats.declined, color: "text-rose-600" },
           { label: "Pending", value: stats.pending, color: "text-amber-600" },
         ].map((s) => (
-          <Card key={s.label}>
+          <Card key={s.label} className="transition-transform hover:scale-[1.02] cursor-default">
             <CardHeader className="p-3 pb-1">
               <CardDescription className="text-xs">{s.label}</CardDescription>
               <CardTitle className={`text-xl ${s.color}`}>{s.value}</CardTitle>

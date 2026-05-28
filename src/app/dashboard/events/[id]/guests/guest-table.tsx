@@ -153,7 +153,7 @@ export function GuestTable({ eventId, guests, canAddMore = true }: GuestTablePro
                       size="icon-xs"
                       onClick={() => handleDelete(guest.id)}
                     >
-                      <Trash2 className="h-3.5 w-3.5 text-stone-400 hover:text-rose-600" />
+                      <Trash2 className="h-3.5 w-3.5 text-stone-400 transition-colors hover:text-rose-600" />
                     </Button>
                   </TableCell>
                 </TableRow>
