@@ -1,6 +1,6 @@
 "use server";
 
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 
 type InvitationTone = "formal" | "romantic" | "funny" | "classic" | "modern";
 
@@ -17,12 +17,12 @@ export async function generateInvitationCopy(
   tone: InvitationTone,
   context: InvitationContext,
 ): Promise<string[]> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error("ANTHROPIC_API_KEY is not configured");
+    throw new Error("GEMINI_API_KEY is not configured. Get a free key at https://aistudio.google.com");
   }
 
-  const anthropic = new Anthropic({ apiKey });
+  const genai = new GoogleGenAI({ apiKey });
 
   const toneGuidance: Record<InvitationTone, string> = {
     formal:
@@ -41,7 +41,7 @@ export async function generateInvitationCopy(
     ? `Location: ${context.eventLocation}`
     : "";
 
-  const userMessage = `Write 3 different invitation text variants for the following event:
+  const prompt = `Write 3 different invitation text variants for the following event:
 
 Event: ${context.eventTitle}
 Type: ${context.eventType}
@@ -62,26 +62,26 @@ Requirements:
 
 Output exactly 3 variants separated by "---". No numbering, no labels.`;
 
-  const msg = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 800,
-    temperature: 0.9,
-    system:
-      "You are a professional invitation copywriter specializing in western social etiquette for weddings, galas, and formal parties. You write elegant, polished invitation text.",
-    messages: [
-      {
-        role: "user",
-        content: userMessage,
-      },
-    ],
+  const response = await genai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [{ role: "user", parts: [{ text: prompt }] }],
+    config: {
+      systemInstruction:
+        "You are a professional invitation copywriter specializing in western social etiquette for weddings, galas, and formal parties. You write elegant, polished invitation text.",
+      maxOutputTokens: 800,
+      temperature: 0.9,
+    },
   });
 
-  const text = msg.content
-    .filter((block) => block.type === "text")
-    .map((block) => block.text)
-    .join("");
+  const text = response.candidates?.[0]?.content?.parts
+    ?.filter((part) => part.text)
+    .map((part) => part.text)
+    .join("") ?? "";
 
-  // Split by separator and clean
+  if (!text) {
+    throw new Error("Gemini returned an empty response. Please try again.");
+  }
+
   return text
     .split("---")
     .map((v) => v.trim())
