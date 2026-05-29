@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronDown, Sparkles, Users, Mail, MapPin, CalendarDays, PartyPopper } from "lucide-react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
@@ -34,6 +34,9 @@ const allThemes = getAllThemes();
 function HeroWaxSealDemo() {
   const [phase, setPhase] = useState<"idle" | "cracking" | "opening" | "revealed">("idle");
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const crackLines = useMemo(
     () =>
@@ -66,6 +69,50 @@ function HeroWaxSealDemo() {
     } else if (phase === "revealed") {
       setPhase("idle");
     }
+  }
+
+  // Avoid SSR hydration mismatch by rendering a static version first
+  if (!mounted) {
+    return (
+      <div className="relative mx-auto max-w-sm">
+        <p className="mb-4 text-center font-script text-lg text-gold">✦ Tap the seal to open your invitation ✦</p>
+        <div className="relative cursor-pointer">
+          <div className="relative overflow-hidden rounded-2xl shadow-2xl" style={{ aspectRatio: "4/3", background: "#1A1410" }}>
+            <div className="absolute inset-0 bg-gradient-to-br from-[#2a2420] via-[#1a1510] to-[#0d0b0a]" />
+            <div className="absolute inset-0 opacity-[0.03]" style={{
+              backgroundImage: "linear-gradient(rgba(201,168,76,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.2) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+            }} />
+            <div className="absolute inset-3 rounded-lg border border-gold/10" />
+            <div className="absolute inset-6 rounded border border-gold/5" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-8 opacity-40">
+              <p className="font-sans text-xs tracking-[0.25em] uppercase text-gold-light/60">You are cordially invited to</p>
+              <p className="mt-2 font-serif text-xl italic text-cream/60">Sarah & James&apos;s Wedding</p>
+              <div className="mt-3 flex items-center gap-1 font-sans text-xs text-cream/40">
+                <CalendarDays className="h-3 w-3" />
+                <span>October 1, 2026</span>
+              </div>
+              <div className="mt-1 flex items-center gap-1 font-sans text-xs text-cream/40">
+                <MapPin className="h-3 w-3" />
+                <span>The Grand Ballroom, NYC</span>
+              </div>
+            </div>
+            <div className="absolute top-0 left-0 right-0 z-10 origin-top" style={{ height: "55%" }}>
+              <div className="h-full w-full shadow-lg" style={{ background: "linear-gradient(180deg, #3a3530 0%, #2a2520 100%)", clipPath: "polygon(0 0, 50% 100%, 100% 0)", borderRadius: "12px 12px 0 0" }} />
+              <div className="absolute bottom-0 left-1/2 z-20 -translate-x-1/2 translate-y-1/2">
+                <div className="relative flex h-20 w-20 items-center justify-center">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full shadow-2xl" style={{ background: "radial-gradient(circle at 35% 35%, #FFE89C 0%, #E0C97E 25%, #C9A84C 45%, #8B6914 75%, #5C4510 100%)", boxShadow: "0 0 40px rgba(201,168,76,0.4), 0 0 80px rgba(201,168,76,0.15), 0 8px 32px rgba(0,0,0,0.5)" }}>
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gold/30 bg-gold/5">
+                      <span className="font-display text-2xl text-cream drop-shadow-lg">V</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
