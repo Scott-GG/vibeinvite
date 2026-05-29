@@ -301,18 +301,18 @@ export default async function BillingPage() {
             </ul>
             {!isWedding ? (
               <div className="mt-6">
-                <button
+                <Link
+                  href="/contact"
                   className="flex h-10 w-full items-center justify-center rounded-lg border text-sm font-medium transition-colors"
                   style={{
                     borderColor: "rgba(201,168,76,0.3)",
                     color: "#8B7355",
                     background: "#FAF7F2",
                   }}
-                  onClick={() => window.location.href = "/contact"}
                 >
                   Contact Sales
                   <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" />
-                </button>
+                </Link>
               </div>
             ) : (
               <div className="mt-6">
