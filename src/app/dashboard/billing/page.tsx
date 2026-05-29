@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CreditCard, ArrowUpRight } from "lucide-react";
+import { CreditCard, Check, X, Crown, ArrowUpRight } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -11,6 +11,28 @@ import { Badge } from "@/components/ui/badge";
 import { createClient, requireUser } from "@/lib/supabase/server";
 import { UpgradeButton } from "./upgrade-button";
 import { PayPalPortalButton } from "./paypal-portal-button";
+
+const freeFeatures = [
+  { label: "Up to 15 guests", included: true },
+  { label: "1 basic theme (Classic Elegance)", included: true },
+  { label: "Email invitations", included: true },
+  { label: "RSVP tracking & stats", included: true },
+  { label: "AI invitation copywriter", included: false },
+  { label: "CSV bulk guest import", included: false },
+  { label: "Dietary preferences & seating", included: false },
+  { label: "Priority support", included: false },
+];
+
+const proFeatures = [
+  { label: "Unlimited guests", included: true },
+  { label: "All 6 premium themes", included: true },
+  { label: "Email invitations", included: true },
+  { label: "RSVP tracking & stats", included: true },
+  { label: "AI invitation copywriter", included: true },
+  { label: "CSV bulk guest import", included: true },
+  { label: "Dietary preferences & seating", included: true },
+  { label: "Priority support", included: true },
+];
 
 export default async function BillingPage() {
   const supabase = await createClient();
@@ -29,11 +51,7 @@ export default async function BillingPage() {
     .order("created_at", { ascending: false });
 
   const tier = profile?.subscription_tier ?? "free";
-
-  const tierLabels: Record<string, string> = {
-    free: "Free",
-    unlimited: "Unlimited",
-  };
+  const isPro = tier === "unlimited";
 
   return (
     <div className="p-6 lg:p-8">
@@ -42,61 +60,153 @@ export default async function BillingPage() {
         Manage your plan and view purchase history
       </p>
 
+      {/* Plan comparison */}
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        {/* Current Plan */}
-        <Card>
+        {/* Free Card */}
+        <Card className={isPro ? "opacity-70" : ""}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Current Plan
+              Free
             </CardTitle>
-            <CardDescription>Your subscription tier</CardDescription>
+            <CardDescription>Current plan</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-bold">{tierLabels[tier]}</p>
-                <p className="text-sm text-muted-foreground">
-                  {tier === "free"
-                    ? "Up to 15 guests, basic templates"
-                    : "Unlimited everything"}
-                </p>
-              </div>
-              <Badge
-                variant={tier === "unlimited" ? "default" : "outline"}
-                className="capitalize"
-              >
-                {tier}
-              </Badge>
-            </div>
+            <p className="text-3xl font-bold tracking-tight">
+              $0<span className="text-lg font-normal text-muted-foreground">/mo</span>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Great for trying it out
+            </p>
 
-            {tier === "free" && (
+            <ul className="mt-6 space-y-3">
+              {freeFeatures.map((f, i) => {
+                const Icon = f.included ? Check : X;
+                return (
+                  <li
+                    key={i}
+                    className="flex items-center gap-2.5 text-sm"
+                  >
+                    <Icon
+                      className={`h-4 w-4 shrink-0 ${
+                        f.included ? "text-emerald-500" : "text-stone-300"
+                      }`}
+                    />
+                    <span
+                      className={
+                        f.included ? "text-stone-700" : "text-stone-400"
+                      }
+                    >
+                      {f.label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Pro Card */}
+        <Card
+          className={
+            !isPro
+              ? "relative border-amber-300 ring-2 ring-amber-100 shadow-lg"
+              : ""
+          }
+        >
+          {!isPro && (
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-100 px-4 py-0.5 text-xs font-medium text-amber-800">
+              Most Popular
+            </span>
+          )}
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-amber-600" />
+              Pro
+              {!isPro && (
+                <Badge className="ml-1 bg-amber-100 text-amber-800 hover:bg-amber-100">
+                  Recommended
+                </Badge>
+              )}
+            </CardTitle>
+            <CardDescription>
+              {isPro ? "Your current plan" : "For power hosts"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-3xl font-bold tracking-tight">
+              $12<span className="text-lg font-normal text-muted-foreground">/mo</span>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Unlimited everything
+            </p>
+
+            <ul className="mt-6 space-y-3">
+              {proFeatures.map((f, i) => {
+                const Icon = f.included ? Check : X;
+                return (
+                  <li
+                    key={i}
+                    className="flex items-center gap-2.5 text-sm"
+                  >
+                    <Icon
+                      className={`h-4 w-4 shrink-0 ${
+                        f.included ? "text-emerald-500" : "text-stone-300"
+                      }`}
+                    />
+                    <span
+                      className={
+                        f.included ? "text-stone-700" : "text-stone-400"
+                      }
+                    >
+                      {f.label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+
+            {!isPro && (
               <div className="mt-6">
                 <UpgradeButton
                   type="subscription"
-                  label="Upgrade to Unlimited"
+                  label="Upgrade to Pro — $12/mo"
                 />
+                <p className="mt-2 text-center text-xs text-muted-foreground">
+                  Cancel anytime · No hidden fees
+                </p>
               </div>
             )}
-            {tier === "unlimited" && profile?.paypal_subscriber_id && (
+
+            {isPro && profile?.paypal_subscriber_id && (
               <div className="mt-6">
                 <PayPalPortalButton customerId={profile.paypal_subscriber_id} />
               </div>
             )}
           </CardContent>
         </Card>
+      </div>
 
-        {/* Purchase History */}
+      {/* Purchase History */}
+      <div className="mt-8">
         <Card>
           <CardHeader>
             <CardTitle>Purchase History</CardTitle>
-            <CardDescription>One-time event upgrades and subscriptions</CardDescription>
+            <CardDescription>
+              One-time event upgrades and subscriptions
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {!purchases || purchases.length === 0 ? (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                No purchases yet.
-              </p>
+              <div className="flex flex-col items-center py-12 text-center">
+                <CreditCard className="mb-3 h-10 w-10 text-stone-200" />
+                <p className="text-sm font-medium text-stone-500">
+                  No purchases yet
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Upgrade to Pro — your purchase history will appear here.
+                </p>
+              </div>
             ) : (
               <div className="divide-y rounded-lg border">
                 {purchases.map((p) => (

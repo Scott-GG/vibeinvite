@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Upload, Trash2, Check, Wand2, ClipboardPaste } from "lucide-react";
+import { Upload, Trash2, Check, Wand2, ClipboardPaste, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +10,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -21,6 +28,23 @@ interface ParsedGuest {
   last_name: string;
   email?: string;
   phone?: string;
+  dietary_restrictions?: string;
+  table_number?: number;
+}
+
+const CSV_TEMPLATE = `first_name,last_name,email,phone,dietary_restrictions,table_number
+John,Doe,john@email.com,+1 555-0100,vegetarian,1
+Jane,Smith,jane@email.com,+1 555-0101,vegan,1
+Bob,Johnson,bob@email.com,+1 555-0102,no_restriction,2`;
+
+function downloadTemplate() {
+  const blob = new Blob(["﻿" + CSV_TEMPLATE], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "guest-import-template.csv";
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function parseSmartPaste(text: string): ParsedGuest[] {
@@ -57,7 +81,6 @@ function parseSmartPaste(text: string): ParsedGuest[] {
 
     // If only one part, it's a name
     if (parts.length === 1) {
-      // Could be "Name Surname" or just "Name"
       const names = parts[0].split(/\s+/);
       firstName = names[0] || "";
       lastName = names.slice(1).join(" ") || "";
@@ -83,7 +106,6 @@ function parseSmartPaste(text: string): ParsedGuest[] {
     firstName = names[0] || "";
     lastName = names.slice(1).join(" ") || "";
 
-    // If we still don't have email/phone, check remaining parts
     for (const part of parts) {
       if (part !== namePart) {
         if (part.includes("@") && !email) email = part.replace(/^[<(]+|[>)>]+$/g, "").trim();
@@ -109,18 +131,72 @@ function extractPhone(text: string): string {
 
 function parseCSV(text: string): ParsedGuest[] {
   const lines = text.split(/\n/).filter((l) => l.trim());
-  if (lines.length < 2) return parseSmartPaste(text); // fallback
+  if (lines.length < 2) return parseSmartPaste(text);
 
   // Detect header row
   const header = lines[0].toLowerCase();
   const hasHeader =
     header.includes("name") || header.includes("first") ||
     header.includes("email") || header.includes("phone") ||
-    header.includes("guest");
+    header.includes("guest") || header.includes("dietary") ||
+    header.includes("table");
 
   const dataLines = hasHeader ? lines.slice(1) : lines;
+
+  // If the header row indicates a proper CSV structure, parse each column
+  if (hasHeader) {
+    const headerCols = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/["']/g, ""));
+    const nameColIdx = headerCols.findIndex((c) => c.includes("first") || c === "first_name");
+    const lastColIdx = headerCols.findIndex((c) => c.includes("last") || c === "last_name");
+    const emailColIdx = headerCols.findIndex((c) => c.includes("email"));
+    const phoneColIdx = headerCols.findIndex((c) => c.includes("phone"));
+    const dietaryColIdx = headerCols.findIndex((c) => c.includes("dietary"));
+    const tableColIdx = headerCols.findIndex((c) => c.includes("table"));
+
+    return dataLines
+      .map((line) => {
+        const cols = line.split(",").map((c) => c.trim().replace(/["']/g, ""));
+        const firstName = nameColIdx >= 0 ? cols[nameColIdx] : "";
+        const lastName = lastColIdx >= 0 ? cols[lastColIdx] : "";
+        const email = emailColIdx >= 0 ? cols[emailColIdx] : "";
+        const phone = phoneColIdx >= 0 ? cols[phoneColIdx] : "";
+        const dietary = dietaryColIdx >= 0 ? cols[dietaryColIdx] : "";
+        const tableStr = tableColIdx >= 0 ? cols[tableColIdx] : "";
+        const tableNumber = tableStr ? parseInt(tableStr) : undefined;
+
+        // If no name column found, try parsing first column as "First Last"
+        if (!firstName && nameColIdx < 0) {
+          const names = (cols[0] || "").split(/\s+/);
+          return {
+            first_name: names[0] || "",
+            last_name: names.slice(1).join(" ") || "",
+            email: emailColIdx >= 0 ? cols[emailColIdx] || undefined : undefined,
+            phone: phoneColIdx >= 0 ? cols[phoneColIdx] || undefined : undefined,
+            dietary_restrictions: dietary || undefined,
+            table_number: tableNumber,
+          };
+        }
+        return {
+          first_name: firstName,
+          last_name: lastName,
+          email: email || undefined,
+          phone: phone || undefined,
+          dietary_restrictions: dietary || undefined,
+          table_number: tableNumber,
+        };
+      })
+      .filter((g) => g.first_name);
+  }
+
   return parseSmartPaste(dataLines.join("\n"));
 }
+
+const dietaryOptions = [
+  { value: "", label: "No restriction" },
+  { value: "vegetarian", label: "Vegetarian" },
+  { value: "vegan", label: "Vegan" },
+  { value: "halal", label: "Halal" },
+];
 
 export function GuestImporter({
   eventId,
@@ -142,6 +218,8 @@ export function GuestImporter({
   const [mEmail, setMEmail] = useState("");
   const [mPhone, setMPhone] = useState("");
   const [mPlusOne, setMPlusOne] = useState(false);
+  const [mDietary, setMDietary] = useState("");
+  const [mTableNumber, setMTableNumber] = useState("");
   const [manualAdding, setManualAdding] = useState(false);
 
   const handlePaste = useCallback(() => {
@@ -206,9 +284,12 @@ export function GuestImporter({
       if (mEmail.trim()) formData.set("email", mEmail.trim());
       if (mPhone.trim()) formData.set("phone", mPhone.trim());
       if (mPlusOne) formData.set("plus_one_allowed", "on");
+      if (mDietary) formData.set("dietary_restrictions", mDietary);
+      if (mTableNumber) formData.set("table_number", mTableNumber);
       await addGuest(eventId, formData);
       toast.success("Guest added");
-      setMFirstName(""); setMLastName(""); setMEmail(""); setMPhone(""); setMPlusOne(false);
+      setMFirstName(""); setMLastName(""); setMEmail(""); setMPhone("");
+      setMPlusOne(false); setMDietary(""); setMTableNumber("");
       onImported?.();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to add guest");
@@ -257,7 +338,7 @@ export function GuestImporter({
         {mode === "smart" && (
           <div className="space-y-3">
             <p className="text-xs text-stone-500">
-              Paste names, emails, and phone numbers in any format — from Excel, a contact list, an email CC line, or WhatsApp. We&rsquo;ll figure it out.
+              Paste names, emails, and phone numbers in any format — from Excel, a contact list, an email CC line, or WhatsApp. We'll figure it out.
             </p>
             <textarea
               placeholder={`Alice Smith  alice@email.com  +1 555-0100\nBob Jones  bob@email.com\nCarol <carol@example.com>\nDavid - david@email.com`}
@@ -284,7 +365,6 @@ export function GuestImporter({
                   try {
                     const clipText = await navigator.clipboard.readText();
                     setPasteText(clipText);
-                    // Auto-parse after pasting
                     const result = parseSmartPaste(clipText);
                     if (result.length > 0) {
                       setParsed(result);
@@ -307,8 +387,16 @@ export function GuestImporter({
         {mode === "file" && (
           <div className="space-y-3">
             <p className="text-xs text-stone-500">
-              Drop a CSV, Excel (.xlsx), or text file. We&rsquo;ll find the names and emails.
+              Drop a CSV file. Download our template below to get started.
             </p>
+            <button
+              type="button"
+              onClick={downloadTemplate}
+              className="inline-flex items-center gap-1 text-xs font-medium text-amber-700 hover:text-amber-800"
+            >
+              <Download className="h-3 w-3" />
+              Download CSV template
+            </button>
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
@@ -325,12 +413,12 @@ export function GuestImporter({
             >
               <Upload className={`mb-2 h-6 w-6 ${dragOver ? "text-amber-600" : "text-stone-400"}`} />
               <p className="text-sm text-stone-500">Drop a file here</p>
-              <p className="mt-1 text-xs text-stone-400">CSV, Excel, or TXT</p>
+              <p className="mt-1 text-xs text-stone-400">CSV or TXT</p>
               <label className="mt-3 cursor-pointer rounded-lg bg-stone-100 px-4 py-2 text-xs font-medium text-stone-600 hover:bg-stone-200 transition-colors">
                 Browse Files
                 <input
                   type="file"
-                  accept=".csv,.txt,.xlsx,.xls"
+                  accept=".csv,.txt"
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
@@ -362,6 +450,34 @@ export function GuestImporter({
             <div className="space-y-1.5">
               <Label htmlFor="m-phone">Phone</Label>
               <Input id="m-phone" type="tel" value={mPhone} onChange={(e) => setMPhone(e.target.value)} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="m-dietary">Dietary</Label>
+                <Select value={mDietary} onValueChange={(v) => setMDietary(v ?? "")}>
+                  <SelectTrigger id="m-dietary">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dietaryOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="m-table">Table No.</Label>
+                <Input
+                  id="m-table"
+                  type="number"
+                  min="1"
+                  placeholder="e.g. 5"
+                  value={mTableNumber}
+                  onChange={(e) => setMTableNumber(e.target.value)}
+                />
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Checkbox

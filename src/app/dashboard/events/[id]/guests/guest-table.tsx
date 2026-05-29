@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Mail, Phone } from "lucide-react";
+import { Trash2, Mail, Phone, Utensils } from "lucide-react";
 import { toast } from "sonner";
 import { deleteGuest } from "./actions";
 import { GuestImporter } from "./guest-importer";
@@ -48,6 +48,18 @@ const statusLabels: Record<string, string> = {
   declined: "Declined",
   pending: "Pending",
 };
+
+function getDietaryLabel(value: string | null): string {
+  if (!value) return "—";
+  const labels: Record<string, string> = {
+    vegetarian: "Vegetarian",
+    vegan: "Vegan",
+    halal: "Halal",
+    "no_restriction": "No restriction",
+    none: "No restriction",
+  };
+  return labels[value.toLowerCase()] ?? value;
+}
 
 export function GuestTable({ eventId, guests, canAddMore = true }: GuestTableProps) {
   async function handleDelete(guestId: string) {
@@ -94,6 +106,7 @@ export function GuestTable({ eventId, guests, canAddMore = true }: GuestTablePro
                 <TableHead>Status</TableHead>
                 <TableHead>+1</TableHead>
                 <TableHead>Dietary</TableHead>
+                <TableHead>Table</TableHead>
                 <TableHead className="w-16" />
               </TableRow>
             </TableHeader>
@@ -104,6 +117,13 @@ export function GuestTable({ eventId, guests, canAddMore = true }: GuestTablePro
                   typeof guest.custom_responses === "object" &&
                   "plus_one_name" in guest.custom_responses
                     ? String(guest.custom_responses.plus_one_name)
+                    : null;
+
+                const tableNumber =
+                  guest.custom_responses &&
+                  typeof guest.custom_responses === "object" &&
+                  "table_number" in guest.custom_responses
+                    ? guest.custom_responses.table_number
                     : null;
 
                 return (
@@ -142,7 +162,19 @@ export function GuestTable({ eventId, guests, canAddMore = true }: GuestTablePro
                   </TableCell>
                   <TableCell>
                     {guest.dietary_restrictions ? (
-                      <span className="text-xs">{guest.dietary_restrictions}</span>
+                      <span className="inline-flex items-center gap-1 text-xs">
+                        <Utensils className="h-3 w-3 text-stone-400" />
+                        {getDietaryLabel(guest.dietary_restrictions)}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-stone-300">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {tableNumber ? (
+                      <span className="inline-flex items-center justify-center rounded bg-stone-100 px-1.5 py-0.5 text-xs font-medium text-stone-600">
+                        {String(tableNumber)}
+                      </span>
                     ) : (
                       <span className="text-xs text-stone-300">—</span>
                     )}

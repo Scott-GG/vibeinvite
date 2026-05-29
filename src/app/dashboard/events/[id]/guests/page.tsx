@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Plus, Send, Trash2, UserPlus } from "lucide-react";
+import { ArrowLeft, Plus, Send, Trash2, UserPlus, Download, Upload, Bell } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { createClient, requireUser } from "@/lib/supabase/server";
 import { GuestTable } from "./guest-table";
+import { SendReminderButton } from "./send-reminder-button";
+import { ExportGuestsButton } from "./export-button";
 
 export default async function GuestsPage({
   params,
@@ -79,6 +81,7 @@ export default async function GuestsPage({
           </p>
         </div>
         <div className="flex gap-2">
+          <ExportGuestsButton eventId={id} guests={guests ?? []} />
           <Link
             href={`/dashboard/events/${id}/invite`}
             className={buttonVariants({ variant: "outline" })}
@@ -106,7 +109,20 @@ export default async function GuestsPage({
         ))}
       </div>
 
-      {/* Guest list */}
+      {/* Pending reminder banner */}
+      {stats.pending > 0 && (
+        <div className="mb-4 flex items-center justify-between rounded-lg bg-amber-50 p-3 text-sm">
+          <div className="flex items-center gap-2 text-amber-800">
+            <Bell className="h-4 w-4" />
+            <span>
+              <strong>{stats.pending}</strong> guest{stats.pending !== 1 ? "s" : ""} haven't responded yet
+            </span>
+          </div>
+          <SendReminderButton eventId={id} pendingCount={stats.pending} />
+        </div>
+      )}
+
+      {/* Free plan limit warning */}
       {isFree && guestCount >= MAX_FREE_GUESTS && (
         <div className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
           You&apos;ve reached the 15-guest limit on the Free plan.{" "}
@@ -116,6 +132,7 @@ export default async function GuestsPage({
           .
         </div>
       )}
+
       <GuestTable eventId={id} guests={guests ?? []} canAddMore={canAddMore} />
     </div>
   );
