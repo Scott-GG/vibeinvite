@@ -1,13 +1,6 @@
 import Link from "next/link";
-import { PlusCircle, CalendarDays, Users, Clock, PartyPopper, ArrowRight } from "lucide-react";
+import { PlusCircle, CalendarDays, Users, Clock, PartyPopper } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { createClient, requireUser } from "@/lib/supabase/server";
 import { EventCard } from "@/app/dashboard/event-card";
@@ -24,7 +17,6 @@ export default async function DashboardPage() {
 
   const hasEvents = events && events.length > 0;
 
-  // Fetch guest counts for all events
   let guestCounts: Record<string, { total: number; attending: number }> = {};
   let totalGuests = 0;
   let pendingRsvps = 0;
@@ -55,7 +47,6 @@ export default async function DashboardPage() {
       }
     }
 
-    // Count events in the next 7 days
     const now = new Date();
     const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     upcomingWeek = events!.filter((e) => {
@@ -65,115 +56,221 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="p-6 lg:p-8" style={{ background: "#FAF7F2" }}>
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1
+            className="font-display text-3xl tracking-wide"
+            style={{ color: "#1A1410" }}
+          >
             Your Events
           </h1>
-          <p className="text-muted-foreground">
+          <p style={{ color: "#8B7355" }} className="mt-1 font-sans text-sm">
             Manage your invitations and track RSVPs
           </p>
         </div>
-        <Link href="/dashboard/events/new" className={buttonVariants({})}>
+        <Link
+          href="/dashboard/events/new"
+          className={buttonVariants({})}
+          style={{ background: "#1A1410", color: "#FAF7F2" }}
+        >
           <PlusCircle className="mr-2 h-4 w-4" />
           New Event
         </Link>
       </div>
 
-      {/* Stats bar */}
+      {/* Stats bar — gold left border accent */}
       {hasEvents && (
-        <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {[
             {
-              label: "Total Events",
+              label: "Events",
               value: events!.length,
               icon: CalendarDays,
-              color: "text-stone-700",
+              color: "#C9A84C",
             },
             {
-              label: "Total Guests",
+              label: "Guests Total",
               value: totalGuests,
               icon: Users,
-              color: "text-stone-700",
+              color: "#C9A84C",
             },
             {
-              label: "Pending RSVPs",
+              label: "Awaiting Reply",
               value: pendingRsvps,
               icon: Clock,
-              color: "text-amber-600",
+              color: "#C9853A",
             },
             {
-              label: "Upcoming (7d)",
+              label: "This Week",
               value: upcomingWeek,
               icon: PartyPopper,
-              color: "text-emerald-600",
+              color: "#4A7C59",
             },
           ].map((stat) => {
             const Icon = stat.icon;
             return (
-              <Card key={stat.label} className="transition-shadow hover:shadow-sm">
-                <CardContent className="flex items-center gap-3 p-4">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-stone-100">
-                    <Icon className={`h-4.5 w-4.5 ${stat.color}`} />
+              <div
+                key={stat.label}
+                className="group relative overflow-hidden rounded-xl transition-all hover:-translate-y-0.5"
+                style={{
+                  background: "#FFFFFF",
+                  borderLeft: `4px solid ${stat.color}`,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                }}
+              >
+                {/* Hover gold shadow */}
+                <div
+                  className="absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100"
+                  style={{
+                    boxShadow: "0 4px 20px rgba(201,168,76,0.15)",
+                  }}
+                />
+                <div className="relative flex items-center gap-4 p-5">
+                  <div
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+                    style={{ background: `${stat.color}12` }}
+                  >
+                    <Icon className="h-5 w-5" style={{ color: stat.color }} />
                   </div>
                   <div>
-                    <p className="text-lg font-bold tracking-tight">
+                    <p
+                      className="font-serif text-4xl font-light tracking-tight"
+                      style={{ color: "#1A1410" }}
+                    >
                       {stat.value}
                     </p>
-                    <p className="text-xs text-muted-foreground">{stat.label}</p>
+                    <p
+                      className="text-[11px] font-medium uppercase tracking-widest"
+                      style={{ color: "#8B7355" }}
+                    >
+                      {stat.label}
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             );
           })}
         </div>
       )}
 
-      {/* Empty state */}
+      {/* Empty state — premium */}
       {!hasEvents && (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-20">
-            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-stone-100">
-              <PartyPopper className="h-10 w-10 text-stone-400" />
-            </div>
-            <CardTitle className="mb-2 text-xl">
-              Create your first invitation
-            </CardTitle>
-            <CardDescription className="mb-2 max-w-sm text-center">
-              Send beautiful, wax-sealed invitations your guests will love.
-              Track RSVPs in real time — all from one dashboard.
-            </CardDescription>
-            <div className="mb-8 flex items-center gap-2 text-xs text-stone-400">
-              <span className="flex items-center gap-1">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                Easy setup
-              </span>
-              <Separator orientation="vertical" className="h-3" />
-              <span className="flex items-center gap-1">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                No design skills needed
-              </span>
-              <Separator orientation="vertical" className="h-3" />
-              <span className="flex items-center gap-1">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                Free to start
-              </span>
-            </div>
-            <Link
-              href="/dashboard/events/new"
-              className={buttonVariants({ size: "lg" })}
+        <div className="flex flex-col items-center justify-center py-24">
+          {/* Envelope illustration */}
+          <div className="relative mb-10">
+            <div
+              className="relative mx-auto h-32 w-48 overflow-hidden rounded-xl"
+              style={{
+                background: "linear-gradient(135deg, #F5EFE3 0%, #E8DCCF 100%)",
+                boxShadow: "0 8px 40px rgba(201,168,76,0.12)",
+              }}
             >
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Create New Event
-            </Link>
-          </CardContent>
-        </Card>
+              {/* Texture */}
+              <div
+                className="absolute inset-0 opacity-[0.12]"
+                style={{
+                  backgroundImage:
+                    "radial-gradient(#C9A84C 1px, transparent 1px)",
+                  backgroundSize: "16px 16px",
+                }}
+              />
+              {/* Border */}
+              <div
+                className="absolute inset-3 rounded-md border"
+                style={{ borderColor: "rgba(201,168,76,0.3)" }}
+              />
+              {/* Flap */}
+              <div
+                className="absolute top-0 left-0 right-0 z-10"
+                style={{
+                  height: "52%",
+                  background:
+                    "linear-gradient(180deg, #EDE2D0 0%, #E0D0B8 100%)",
+                  clipPath: "polygon(0 0, 50% 100%, 100% 0)",
+                }}
+              />
+              {/* Wax seal */}
+              <div className="absolute bottom-0 left-1/2 z-20 -translate-x-1/2 translate-y-1/2">
+                <div
+                  className="flex h-14 w-14 items-center justify-center rounded-full shadow-lg"
+                  style={{
+                    background:
+                      "radial-gradient(circle at 35% 35%, #E8C96B 0%, #C9A84C 30%, #8B6914 70%, #5C4510 100%)",
+                  }}
+                >
+                  <span
+                    className="font-display text-lg"
+                    style={{ color: "#FAF3E0", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}
+                  >
+                    V
+                  </span>
+                </div>
+              </div>
+            </div>
+            {/* Gold glow behind envelope */}
+            <div
+              className="absolute top-1/2 left-1/2 -z-10 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+              style={{ background: "rgba(201,168,76,0.12)" }}
+            />
+          </div>
+
+          <h2
+            className="mb-3 text-center font-display text-2xl tracking-wide"
+            style={{ color: "#1A1410" }}
+          >
+            Your first invitation
+            <br />
+            is waiting to be made.
+          </h2>
+          <p
+            className="mb-2 max-w-sm text-center font-sans text-sm leading-relaxed"
+            style={{ color: "#8B7355" }}
+          >
+            Every great event starts with a moment of anticipation.
+          </p>
+          <div className="mb-10 flex items-center gap-2 text-xs" style={{ color: "#A89880" }}>
+            <span className="flex items-center gap-1">
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ background: "#4A7C59" }}
+              />
+              Easy setup
+            </span>
+            <Separator orientation="vertical" className="h-3" />
+            <span className="flex items-center gap-1">
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ background: "#4A7C59" }}
+              />
+              No design skills needed
+            </span>
+            <Separator orientation="vertical" className="h-3" />
+            <span className="flex items-center gap-1">
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ background: "#4A7C59" }}
+              />
+              Free to start
+            </span>
+          </div>
+          <Link
+            href="/dashboard/events/new"
+            className={buttonVariants({ size: "lg" })}
+            style={{ background: "#1A1410", color: "#FAF7F2" }}
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create Your First Invitation
+          </Link>
+          <p className="mt-4 text-xs" style={{ color: "#A89880" }}>
+            It takes less than 2 minutes.
+          </p>
+        </div>
       )}
 
       {/* Event cards */}
       {hasEvents && (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {events!.map((event) => (
             <EventCard
               key={event.id}

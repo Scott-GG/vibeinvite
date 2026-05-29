@@ -28,6 +28,7 @@ import {
   Lock,
   ChevronUp,
   Eye,
+  Wand2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -48,11 +49,11 @@ const eventTypes = [
 const themes = getAllThemes().map((t) => ({
   id: t.id,
   name: t.name,
-  description: "", // handled inline
+  description: t.emotion,
   icon: [Heart, Sparkles, GlassWater, Moon, Flower2, Waves][
     ["classic", "romantic", "modern", "midnight", "botanical", "coastal"].indexOf(t.id)
   ] ?? Heart,
-  colors: [t.accentColor, t.cardTitle === "text-stone-100" ? "#3a3530" : "#f5f0eb", t.sealOuter],
+  colors: [t.accentColor, t.cardTitle === "text-deep" || t.cardTitle === "text-stone-800" ? "#f5f0eb" : "#3a3530", t.sealOuter],
   pro: t.id !== "classic",
 }));
 
@@ -84,6 +85,8 @@ export default function NewEventPage() {
     event_time: "",
     location_name: "",
     location_address: "",
+    dress_code: "",
+    event_notes: "",
     theme: "classic",
   });
 
@@ -117,7 +120,11 @@ export default function NewEventPage() {
         event_date: eventDate,
         location_name: form.location_name,
         location_address: form.location_address || null,
-        config: { theme: form.theme },
+        config: {
+          theme: form.theme,
+          dress_code: form.dress_code || undefined,
+          event_notes: form.event_notes || undefined,
+        },
       })
       .select("id")
       .single();
@@ -312,17 +319,24 @@ export default function NewEventPage() {
             <div
               className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
                 i < step
-                  ? "bg-stone-900 text-white"
+                  ? "text-white"
                   : i === step
-                    ? "border-2 border-stone-900 text-stone-900"
+                    ? "border-2"
                     : "border-2 border-stone-200 text-stone-400"
               }`}
+              style={
+                i < step
+                  ? { background: "#C9A84C" }
+                  : i === step
+                    ? { borderColor: "#C9A84C", color: "#C9A84C" }
+                    : {}
+              }
             >
               {i < step ? <Check className="h-4 w-4" /> : i + 1}
             </div>
             <span
               className={`text-sm font-medium ${
-                i <= step ? "text-stone-900" : "text-stone-400"
+                i <= step ? "text-amber-700" : "text-stone-400"
               }`}
             >
               {label}
@@ -372,7 +386,7 @@ export default function NewEventPage() {
                             className={cn(
                               "flex flex-col items-center gap-1 rounded-xl border-2 px-3 py-3 text-center transition-all",
                               selected
-                                ? "border-stone-900 bg-stone-50 shadow-sm"
+                                ? "border-amber-500 bg-amber-50/50 shadow-sm"
                                 : "border-stone-200 bg-white hover:border-stone-300 hover:bg-stone-50/50"
                             )}
                           >
@@ -380,7 +394,7 @@ export default function NewEventPage() {
                             <span
                               className={cn(
                                 "text-xs font-medium",
-                                selected ? "text-stone-900" : "text-stone-600"
+                                selected ? "text-amber-700" : "text-stone-600"
                               )}
                             >
                               {type.label}
@@ -419,9 +433,9 @@ export default function NewEventPage() {
             {step === 1 && (
               <>
                 <CardHeader>
-                  <CardTitle>Location</CardTitle>
+                  <CardTitle>Location &amp; Details</CardTitle>
                   <CardDescription>
-                    Where will the event take place?
+                    Where and what to expect
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -442,6 +456,33 @@ export default function NewEventPage() {
                       value={form.location_address}
                       onChange={(e) => update("location_address", e.target.value)}
                     />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="dress_code">Dress Code</Label>
+                    <select
+                      id="dress_code"
+                      value={form.dress_code}
+                      onChange={(e) => update("dress_code", e.target.value)}
+                      className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700 transition-colors focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                    >
+                      <option value="">Select dress code (optional)</option>
+                      <option value="Black Tie">Black Tie</option>
+                      <option value="Formal">Formal</option>
+                      <option value="Cocktail Attire">Cocktail Attire</option>
+                      <option value="Smart Casual">Smart Casual</option>
+                      <option value="Garden Party Attire">Garden Party Attire</option>
+                      <option value="Beach Formal">Beach Formal</option>
+                    </select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="event_notes">Event Notes</Label>
+                    <Input
+                      id="event_notes"
+                      placeholder="e.g. Valet parking available, outdoor ceremony"
+                      value={form.event_notes}
+                      onChange={(e) => update("event_notes", e.target.value)}
+                    />
+                    <p className="text-xs text-stone-400">Special notes for your guests (optional)</p>
                   </div>
                 </CardContent>
               </>
@@ -489,14 +530,17 @@ export default function NewEventPage() {
                             locked
                               ? "cursor-not-allowed border-stone-200 bg-stone-50 opacity-60"
                               : selected
-                                ? "border-stone-900 bg-stone-50"
+                                ? "border-amber-500 bg-amber-50/50 shadow-sm"
                                 : "border-transparent bg-stone-100 hover:bg-stone-50"
                           }`}
                         >
                           {locked ? (
                             <Lock className="mb-3 h-8 w-8 text-stone-300" />
                           ) : (
-                            <IconComponent className="mb-3 h-8 w-8 text-stone-700" />
+                            <IconComponent
+                              className="mb-3 h-8 w-8"
+                              style={{ color: selected ? "#C9A84C" : "#3D3530" }}
+                            />
                           )}
                           <h3 className="mb-1 font-medium text-sm">
                             {theme.name}
@@ -506,6 +550,9 @@ export default function NewEventPage() {
                               </span>
                             )}
                           </h3>
+                          <p className="mb-3 font-serif text-[11px] italic leading-relaxed text-stone-400">
+                            {theme.description}
+                          </p>
                           <div className="mt-3 flex gap-1.5">
                             {theme.colors.map((c) => (
                               <div

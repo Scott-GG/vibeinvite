@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, X, Users, Utensils, MapPin, CalendarDays, Gift, ChevronDown } from "lucide-react";
+import { Check, X, Users, Utensils, MapPin, CalendarDays, Gift, ChevronDown, Share2, Copy, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -125,25 +125,115 @@ export function RsvpForm({
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-              className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-stone-100"
+              className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full"
+              style={{
+                background: status === "accepted" ? "rgba(74,124,89,0.1)" : "rgba(200,140,100,0.1)",
+              }}
             >
               {status === "accepted" ? (
-                <Check className="h-10 w-10 text-emerald-600" />
+                <Check className="h-10 w-10" style={{ color: "#4A7C59" }} />
               ) : (
-                <X className="h-10 w-10 text-rose-500" />
+                <X className="h-10 w-10" style={{ color: "#C9853A" }} />
               )}
             </motion.div>
             <h2
-              className={`mb-2 text-2xl sm:text-3xl ${t.cardTitle}`}
-              style={{ fontFamily: t.fontClass === "font-sans" ? undefined : "serif" }}
+              className={`mb-2 font-serif text-2xl italic sm:text-3xl ${t.cardTitle}`}
             >
-              {status === "accepted" ? "See you there!" : "Response Received"}
+              {status === "accepted" ? "We can't wait to celebrate with you." : "We'll miss you there."}
             </h2>
-            <p className={`mx-auto max-w-sm leading-relaxed ${t.cardBody}`}>
-              {status === "accepted"
-                ? `Thank you, ${firstName}. We've saved your spot at ${eventTitle}.`
-                : `Thank you for letting us know, ${firstName}. You'll be missed at ${eventTitle}.`}
-            </p>
+
+            {status === "accepted" ? (
+              <>
+                <div className={`mx-auto mt-4 max-w-sm space-y-2 text-sm ${t.cardBody}`}>
+                  <p className="font-medium" style={{ color: t.cardTitle === "text-stone-100" ? "#e0d5c0" : "#1A1410" }}>
+                    {eventTitle}
+                  </p>
+                  <p>{eventDate}{eventTime ? ` at ${eventTime}` : ""}</p>
+                  {eventLocation && <p>{eventLocation}</p>}
+                </div>
+
+                {/* Action buttons */}
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                  {/* Add to Calendar */}
+                  <a
+                    href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${encodeURIComponent(eventDate)}${eventLocation ? `&location=${encodeURIComponent(eventLocation)}` : ""}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium shadow-sm transition-all hover:shadow-md"
+                    style={{
+                      background: t.accentColor,
+                      color: isDark ? "#0d0d0d" : "#fff",
+                    }}
+                  >
+                    <CalendarDays className="h-4 w-4" />
+                    Add to Calendar
+                  </a>
+                  {eventLocation && (
+                    <a
+                      href={`https://maps.google.com/?q=${encodeURIComponent(eventLocation)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium shadow-sm transition-all hover:shadow-md"
+                      style={{
+                        background: isDark ? "#3D3530" : "#F5EFE3",
+                        color: isDark ? "#e0d5c0" : "#3D3530",
+                      }}
+                    >
+                      <MapPin className="h-4 w-4" />
+                      View on Map
+                    </a>
+                  )}
+                </div>
+
+                {/* Share */}
+                <div className="mt-6 pt-6" style={{ borderTop: "1px solid rgba(201,168,76,0.15)" }}>
+                  <p className={`mb-3 text-xs tracking-wider uppercase ${t.cardSubtitle}`}>
+                    Share this moment
+                  </p>
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(window.location.href);
+                        toast.success("Link copied to clipboard");
+                      }}
+                      className="flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium transition-colors hover:opacity-80"
+                      style={{
+                        background: isDark ? "#3D3530" : "#F5EFE3",
+                        color: isDark ? "#e0d5c0" : "#3D3530",
+                      }}
+                    >
+                      <Copy className="h-3.5 w-3.5" />
+                      Copy Link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const text = `I'm attending ${eventTitle}! ${window.location.href}`;
+                        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+                      }}
+                      className="flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-medium transition-colors hover:opacity-80"
+                      style={{
+                        background: isDark ? "#3D3530" : "#F5EFE3",
+                        color: isDark ? "#e0d5c0" : "#3D3530",
+                      }}
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+                      WhatsApp
+                    </button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="mt-6">
+                <p className={`mx-auto max-w-sm leading-relaxed ${t.cardBody}`}>
+                  Thank you for letting us know. We hope to celebrate with you another time.
+                </p>
+                <p className={`mt-4 font-serif text-lg italic ${t.cardTitle}`}>
+                  &mdash; {eventTitle}
+                </p>
+              </div>
+            )}
           </motion.div>
         ) : (
           <motion.div
