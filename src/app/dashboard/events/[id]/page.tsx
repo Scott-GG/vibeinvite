@@ -92,9 +92,8 @@ export default async function EventDetailPage({
           </Link>
           {isFree ? (
             <UpgradeButton
-              type="pro_event"
-              eventId={id}
-              label="Unlock Pro — $29"
+              type="subscription"
+              label="Upgrade to Pro — $12/mo"
             />
           ) : (
             <Link
@@ -173,18 +172,12 @@ export default async function EventDetailPage({
         <div className="mt-8 rounded-xl border-2 border-dashed border-stone-200 p-8 text-center">
           <h3 className="font-semibold text-stone-700">AI Copywriter</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Generate beautiful invitation copy with AI. Upgrade to Pro or
-            Unlimited to unlock.
+            Generate beautiful invitation copy with AI. Upgrade to Pro to unlock.
           </p>
           <div className="mt-4 flex items-center justify-center gap-3">
             <UpgradeButton
-              type="pro_event"
-              eventId={id}
-              label="Unlock Pro — $29"
-            />
-            <UpgradeButton
               type="subscription"
-              label="Go Unlimited — $9.99/mo"
+              label="Upgrade to Pro — $12/mo"
             />
           </div>
         </div>
