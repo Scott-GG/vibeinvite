@@ -480,6 +480,15 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
+                className="mt-2 font-sans text-sm tracking-wide text-cream/50"
+              >
+                Premium digital invitations — wax-sealed envelopes, AI copywriting, effortless RSVPs.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
                 className="mx-auto mt-6 max-w-md font-serif text-lg italic leading-relaxed text-cream/60 lg:mx-0"
               >
                 A wax-sealed envelope. A tap to reveal.

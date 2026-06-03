@@ -81,8 +81,10 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="border-0 shadow-2xl ring-1 ring-stone-200/60">
-      <CardHeader className="space-y-1 text-center">
+    <>
+      <h1 className="sr-only">Sign in to VibeInvite — Premium Digital Invitations</h1>
+      <Card className="border-0 shadow-2xl ring-1 ring-stone-200/60">
+        <CardHeader className="space-y-1 text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-stone-900 shadow-lg shadow-stone-900/20">
           <svg
             className="h-7 w-7 text-amber-500"
@@ -156,5 +158,6 @@ export default function LoginPage() {
         </form>
       </CardContent>
     </Card>
+    </>
   );
 }

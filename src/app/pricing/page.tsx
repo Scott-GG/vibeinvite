@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Check, ArrowRight } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { FAQPageSchema, ProductSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Pricing — Simple, Transparent Pricing | VibeInvite",
@@ -75,6 +76,16 @@ const plans = [
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white">
+      <FAQPageSchema
+        questions={[
+          { q: "Can I cancel my Pro subscription anytime?", a: "Absolutely. Cancel anytime from your Billing page. You'll retain access until the end of your billing period. No hidden fees, no lock-in." },
+          { q: "Do my guests need to create an account to RSVP?", a: "No! Each guest receives a unique, secure link. They can RSVP, indicate dietary preferences, and add a plus-one — all without signing up." },
+          { q: "Can I switch from monthly to annual billing?", a: "Yes. Switch anytime from your Billing settings. You'll save 20% with annual billing and the change takes effect at the start of your next billing cycle." },
+          { q: "What payment methods do you accept?", a: "We process payments securely through PayPal. All major credit and debit cards are accepted — Visa, Mastercard, American Express, and more." },
+          { q: "Is there a free trial for Pro?", a: "You can start with the Free plan to try the core experience. When you're ready, upgrade to Pro — if you cancel within 7 days, you won't be charged." },
+          { q: "Can I use VibeInvite for multiple events?", a: "Free and Pro support one active event at a time. The Team plan supports unlimited events and is designed for planners managing multiple celebrations." },
+        ]}
+      />
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4">
         <Link href="/" className="text-lg font-semibold tracking-tight">

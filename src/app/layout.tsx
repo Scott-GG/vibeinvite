@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Italiana, Cormorant_Garamond, Great_Vibes, Jost, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { OrganizationSchema, WebSiteSchema } from "@/lib/schema";
 import "./globals.css";
 
 const italiana = Italiana({
@@ -96,7 +97,6 @@ export const metadata: Metadata = {
     title: "VibeInvite — Premium Digital Invitations",
     description:
       "Create stunning, paper-like digital invitations with wax-sealed envelope animations.",
-    images: ["/og-image.png"],
   },
   alternates: {
     canonical: siteUrl,
@@ -110,6 +110,7 @@ const productLinks = [
   { href: "/#features", label: "Features" },
   { href: "/#themes", label: "Themes" },
   { href: "/pricing", label: "Pricing" },
+  { href: "/blog", label: "Blog" },
 ];
 
 const legalLinks = [
@@ -134,6 +135,8 @@ export default function RootLayout({
       className={`${jost.variable} ${cormorantGaramond.variable} ${italiana.variable} ${greatVibes.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans">
+        <OrganizationSchema />
+        <WebSiteSchema />
         <div className="flex-1">{children}</div>
 
         {/* Brand Footer */}

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { InvitationClient } from "./invitation-client";
+import { EventSchema } from "@/lib/schema";
 
 export async function generateMetadata({
   params,
@@ -77,26 +78,35 @@ export default async function InvitationPage({
     : undefined;
 
   return (
-    <InvitationClient
-      guestId={guest.id}
-      guestName={`${guest.first_name} ${guest.last_name}`}
-      eventTitle={event.title}
-      eventType={event.event_type}
-      eventDate={eventDate.toLocaleDateString("en-US", {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })}
-      eventDateRaw={eventDate}
-      eventTime={eventTime}
-      eventLocation={event.location_name ?? undefined}
-      plusOneAllowed={guest.plus_one_allowed}
-      theme={theme}
-      coverImage={event.cover_image_url ?? undefined}
-      message={message}
-      registryUrl={registryUrl}
-      dressCode={dressCode}
-    />
+    <>
+      <EventSchema
+        title={event.title}
+        startDate={event.event_date}
+        location={event.location_name ?? undefined}
+        image={event.cover_image_url ?? undefined}
+        description={message ?? undefined}
+      />
+      <InvitationClient
+        guestId={guest.id}
+        guestName={`${guest.first_name} ${guest.last_name}`}
+        eventTitle={event.title}
+        eventType={event.event_type}
+        eventDate={eventDate.toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+        eventDateRaw={eventDate}
+        eventTime={eventTime}
+        eventLocation={event.location_name ?? undefined}
+        plusOneAllowed={guest.plus_one_allowed}
+        theme={theme}
+        coverImage={event.cover_image_url ?? undefined}
+        message={message}
+        registryUrl={registryUrl}
+        dressCode={dressCode}
+      />
+    </>
   );
 }

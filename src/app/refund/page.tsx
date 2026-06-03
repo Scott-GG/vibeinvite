@@ -28,29 +28,21 @@ export default function RefundPage() {
           </section>
 
           <section>
-            <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">2. One-Time Event Purchases (Signature Plan)</h2>
+            <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">2. One-Time Event Purchases</h2>
             <p className="mb-2">
-              The Signature plan is a one-time purchase of $29 USD for a single event. It includes:
+              One-time event upgrades are priced according to the plan selected. Features depend on the plan tier.
             </p>
-            <ul className="list-disc space-y-1 pl-5">
-              <li>Unlimited guests for that event</li>
-              <li>All 6 premium themes</li>
-              <li>AI copywriter access</li>
-              <li>Seating chart tool</li>
-              <li>Dietary preference tracking</li>
-            </ul>
             <p className="mt-3">
-              If you have not sent any invitations for the event you purchased the Signature plan for, you may request
+              If you have not sent any invitations for the event you purchased the plan for, you may request
               a full refund within <strong>7 days</strong> of purchase by contacting us. Once invitations have been
               sent, the purchase is non-refundable as the service has been utilized.
             </p>
           </section>
 
           <section>
-            <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">3. Subscription Plans (Host Plan)</h2>
+            <h2 className="mb-3 font-serif text-xl font-semibold text-stone-900">3. Subscription Plans</h2>
             <p className="mb-2">
-              The Host plan is a recurring subscription of $9.99 USD/month. You may cancel at any time:
-            </p>
+              Subscription plans are recurring payments. Current plans: Pro at $12 USD/month and Wedding at $29 USD/month. You may cancel at any time:</p>
             <ul className="list-disc space-y-1 pl-5">
               <li>From your <Link href="/dashboard/billing" className="text-amber-700 underline hover:text-amber-800">Billing dashboard</Link></li>
               <li>Through the PayPal customer portal (accessible from your Billing page)</li>
@@ -61,10 +53,9 @@ export default function RefundPage() {
               </li>
             </ul>
             <p className="mt-3">
-              Upon cancellation, you retain access to all Host features until the end of your current billing period.
+              Upon cancellation, you retain access to all features until the end of your current billing period.
               We do not provide refunds for partial billing periods. If you cancel within <strong>48 hours</strong>{" "}
-              of your first subscription payment and have not used any premium features (beyond the Starter plan&rsquo;s
-              capabilities), you are eligible for a full refund of your initial payment.
+              of your first subscription payment and have not used any premium features, you are eligible for a full refund of your initial payment.
             </p>
           </section>
 

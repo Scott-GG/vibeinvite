@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Mail, Clock, MessageCircle } from "lucide-react";
+import { ContactPointSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
   title: "Contact Us — VibeInvite",
@@ -11,6 +12,7 @@ const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@vibeinvit
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-stone-50">
+      <ContactPointSchema email={supportEmail} />
       <div className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
         <h1 className="font-serif text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl">
           Contact Us
